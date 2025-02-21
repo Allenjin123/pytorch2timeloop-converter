@@ -87,7 +87,7 @@ class ConvLayerDescription(LayerDescription):
                         'default': self.w_stride
                     }
                 ],
-                'data-spaces': [
+                'data_spaces': [
                     {
                         'name': 'Weights',
                         'projection': [
@@ -115,7 +115,7 @@ class ConvLayerDescription(LayerDescription):
                             [[dim_P]],
                             [[dim_Q]]
                         ],
-                        'read-write': True
+                        'read_write': True
                     }
                 ]
             },
@@ -144,7 +144,7 @@ class ConvLayerDescription(LayerDescription):
             'shape': {
                 'name': self.name,
                 'dimensions': dims,
-                'data-spaces': [
+                'data_spaces': [
                     {
                         'name': self.filter_name,
                         'projection': \
@@ -167,7 +167,7 @@ class ConvLayerDescription(LayerDescription):
                               f'{dim_P}, '
                               f'{dim_Q} ]'
                         ),
-                        'read-write': True
+                        'read_write': True
                     }
                 ]
             },
@@ -222,7 +222,7 @@ class MaxPoolLayerDescription(LayerDescription):
         config['problem']['instance']['Wstride'] = self.w_stride
         config['problem']['instance']['Hstride'] = self.h_stride
 
-        # for dspace in config['problem']['shape']['data-spaces']:
+        # for dspace in config['problem']['shape']['data_spaces']:
         #     if dspace['name'] == 'Inputs':
         #         dspace['name'] = self.ifmap_name
         #     elif dspace['name'] == 'Outputs':
@@ -237,7 +237,7 @@ class MaxPoolLayerDescription(LayerDescription):
             'shape': {
                 'name': self.name,
                 'dimensions': dims,
-                'data-spaces': [
+                'data_spaces': [
                     {
                         'name': self.ifmap_name,
                         'projection': (
@@ -255,7 +255,7 @@ class MaxPoolLayerDescription(LayerDescription):
                               f'{dim_P}, '
                               f'{dim_Q} ]'
                         ),
-                        'read-write': True
+                        'read_write': True
                     }
                 ]
             },
@@ -323,7 +323,7 @@ class BinaryElementwiseFuncDescription(LayerDescription):
 
         dims = list(string.ascii_uppercase[:len(self.ofmap_shape)])
 
-        for dspace in config['problem']['shape']['data-spaces']:
+        for dspace in config['problem']['shape']['data_spaces']:
             if dspace['name'] == 'Input1':
                 # dspace['name'] = self.ifmap1_name
                 dspace['projection'] = []
@@ -374,7 +374,7 @@ class BinaryElementwiseFuncDescription(LayerDescription):
             'shape': {
                 'name': self.name,
                 'dimensions': dims,
-                'data-spaces': [
+                'data_spaces': [
                     {
                         'name': self.ifmap1_name,
                         'projection': '[ ' + ', '.join(dims) + ' ]'
@@ -386,7 +386,7 @@ class BinaryElementwiseFuncDescription(LayerDescription):
                     {
                         'name': self.ofmap_name,
                         'projection': '[ ' + ', '.join(dims) + ' ]',
-                        'read-write': True
+                        'read_write': True
                     }
                 ]
             },
@@ -416,7 +416,7 @@ class MatmulFuncDescription(LayerDescription):
             dims = tuple()
             self.extra_dims = tuple()
 
-        for dspace in config['problem']['shape']['data-spaces']:
+        for dspace in config['problem']['shape']['data_spaces']:
             # if dspace['name'] == 'Input1':
             #     dspace['name'] = self.ifmap1_name
             # elif dspace['name'] == 'Input2':
@@ -451,7 +451,7 @@ class SoftmaxFuncDescription(LayerDescription):
 
         dims = tuple(string.ascii_uppercase[:len(self.ifmap_shape)+1])
 
-        for dspace in config['problem']['shape']['data-spaces']:
+        for dspace in config['problem']['shape']['data_spaces']:
             if dspace['name'] == 'Input':
                 # dspace['name'] = self.ifmap_name
                 dspace['projection'] = list(map(
@@ -517,7 +517,7 @@ class ViewFuncDescription(LayerDescription):
             'shape': {
                 'name': self.name,
                 'dimensions': ofmap_dims,
-                'data-spaces': [
+                'data_spaces': [
                     {
                         'name': self.ifmap_name,
                         'projection': '[ ' + ', '.join(ifmap_terms) + ' ]'
@@ -525,7 +525,7 @@ class ViewFuncDescription(LayerDescription):
                     {
                         'name': self.ofmap_name,
                         'projection': '[ ' + ', '.join(ofmap_dims) + ' ]',
-                        'read-write': True
+                        'read_write': True
                     }
                 ]
             },

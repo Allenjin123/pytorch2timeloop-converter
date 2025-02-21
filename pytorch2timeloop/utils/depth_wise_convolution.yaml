@@ -36,7 +36,7 @@ problem:
         default: 1
       - name: Hdilation
         default: 1
-    data-spaces:
+    data_spaces:
       - name: Weights
         projection:
           - [ [C] ]
@@ -54,7 +54,7 @@ problem:
           - [ [C] ]
           - [ [Q] ]
           - [ [P] ]
-        read-write: True
+        read_write: True
   instance:
     C: 16
     N: 1

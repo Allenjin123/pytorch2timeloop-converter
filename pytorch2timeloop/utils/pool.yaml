@@ -36,7 +36,7 @@ problem:
         default: 1
       - name: Hdilation
         default: 1
-    data-spaces:
+    data_spaces:
       - name: Inputs
         projection:
           - [ [N] ]

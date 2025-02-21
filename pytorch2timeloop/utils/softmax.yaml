@@ -2,7 +2,7 @@ problem:
   shape:
     name: "softmax"
     dimensions: []
-    data-spaces:
+    data_spaces:
       - name: Input
       - name: Output
         read-write: True

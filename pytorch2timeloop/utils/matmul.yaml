@@ -1,7 +1,7 @@
 problem:
   shape:
     dimensions: [ M, N, K ]
-    data-spaces:
+    data_spaces:
       - name: Input1
         projection:
           - [ [M] ]
@@ -14,7 +14,7 @@ problem:
         projection:
           - [ [M] ]
           - [ [N] ]
-        read-write: True
+        read_write: True
   instance:
     M: 1
     N: 1
