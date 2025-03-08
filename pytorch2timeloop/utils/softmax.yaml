@@ -5,4 +5,4 @@ problem:
     data_spaces:
       - name: Input
       - name: Output
-        read-write: True
+        read_write: True

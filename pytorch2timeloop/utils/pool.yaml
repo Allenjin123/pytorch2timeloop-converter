@@ -49,7 +49,7 @@ problem:
           - [ [M] ]
           - [ [Q] ]
           - [ [P] ]
-        read-write: True
+        read_write: True
   instance:
     C: 16
     M: 32

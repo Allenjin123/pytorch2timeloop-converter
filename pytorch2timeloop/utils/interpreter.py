@@ -49,7 +49,8 @@ class Converter(fx.Interpreter):
         torch.div
     ]
 
-    DEFAULT_IGNORED_FUNC = []
+    DEFAULT_IGNORED_FUNC = [
+    ]
 
     SOFTMAX = [
         torch.softmax,
@@ -74,8 +75,8 @@ class Converter(fx.Interpreter):
 
         if ignored_func is None:
             ignored_func = Converter.DEFAULT_IGNORED_FUNC
+        
         self.ignored_func = ignored_func
-
         self.bypassed_arg_remap = {}
 
     def run_node(self, n):
