@@ -223,25 +223,25 @@ if __name__ == "__main__":
     print("Converting AlexNet...")
     convert_alexnet()
     
-    print("Converting VGG16...")
-    convert_vgg16()
+    # print("Converting VGG16...")
+    # convert_vgg16()
     
-    print("Converting ResNet18...")
-    convert_resnet18()
+    # print("Converting ResNet18...")
+    # convert_resnet18()
     
-    print("Converting DenseNet121...")
-    convert_densenet121()
+    # print("Converting DenseNet121...")
+    # convert_densenet121()
     
-    print("Converting MobileNetV3...")
-    convert_mobilenet_v3()
+    # print("Converting MobileNetV3...")
+    # convert_mobilenet_v3()
     
-    print("Converting SqueezeNet...")
-    convert_squeezenet()
+    # print("Converting SqueezeNet...")
+    # convert_squeezenet()
     
-    print("Converting GoogLeNet...")
-    convert_googlenet()
+    # print("Converting GoogLeNet...")
+    # convert_googlenet()
     
-    print("Converting EfficientNet-B0...")
-    convert_efficientnet_b0()
+    # print("Converting EfficientNet-B0...")
+    # convert_efficientnet_b0()
     
-    print("All conversions completed!")
+    # print("All conversions completed!")

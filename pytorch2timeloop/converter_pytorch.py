@@ -18,7 +18,6 @@ logger = logging.getLogger(__name__)
 
 def convert_model_with_sample_input(model: nn.Module,
                                     sample_input: Any,
-                                    batch_size: int,
                                     model_name: str,
                                     save_dir: Path,
                                     exception_module_names=[]):
@@ -33,7 +32,6 @@ def convert_model_with_sample_input(model: nn.Module,
 
     :param model: the PyTorch CNN model
     :param sample_input:
-    :param batch_size: the batch size
     :param model_name: the name of the model, which will become the name
         of the subdirectory of `save_dir` with the problem files
     :param save_dir: the directory to save the output in
@@ -75,7 +73,7 @@ def convert_model(model: nn.Module, input_size: tuple, batch_size: int,
             model_name
         )
     )
-    sample_input = torch.rand(2, *input_size).type(torch.FloatTensor)
+    sample_input = torch.rand(batch_size, *input_size).type(torch.FloatTensor)
     layer_data = _make_summary(model, sample_input, ignored_func=ignored_func)
     _convert_from_layer_data(layer_data, model_name, save_dir, exception_module_names, fuse=fuse)
 
