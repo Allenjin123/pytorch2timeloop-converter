@@ -49,7 +49,7 @@ Converter.DEFAULT_IGNORED_FUNC.extend([
     F.pad                
 ])
 
-def convert_replknet():
+def convert_replknet(batch_size: int):
     """
     Convert RepLKNet to Timeloop format using the implementation from replknet.py.
     Uses large depthwise convolutions (up to 31x31) as described in the paper
@@ -93,9 +93,8 @@ def convert_replknet():
         return
     
     input_shape = (3, 224, 224)  # Standard ImageNet input size
-    batch_size = 1
     top_dir = 'workloads'
-    model_name = 'replknet31b'
+    model_name = f'replknet31b_{batch_size}'
     convert_fc = False  # RepLKNet has a final linear layer
     
     # Define exception module names specific to RepLKNet architecture
@@ -130,5 +129,8 @@ def convert_replknet():
 # Main execution
 if __name__ == "__main__":
     print("Converting RepLKNet-31B...")
-    convert_replknet()
+    convert_replknet(batch_size=1)
+    print("Conversion completed!")
+    print("Converting RepLKNet-31B...")
+    convert_replknet(batch_size=32)
     print("Conversion completed!")
