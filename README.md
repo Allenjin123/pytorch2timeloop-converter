@@ -1,6 +1,7 @@
 # pytorch2timeloop-converter
 
 Converting pytorch convolutional neural nets and certain transformers to Timeloop workload files.
+Fixed the batch number bugs in the original repo.
 
 ### Installing the converter
 After cloning this repository, run `python setup.py install` to finish the installation. Note that this converter has been developed and tested with: 
