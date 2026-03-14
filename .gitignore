@@ -67,5 +67,8 @@ tmp.mp4
 test.py
 workloads/
 
+# Generated LLM workloads (MoE models produce 100K+ files)
+llm_workloads/qwen3_*/
+
 # Test results
 .test.tmp
