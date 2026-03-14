@@ -437,7 +437,20 @@ def convert_llm(config_path: str, save_dir: str,
         cfg.vocab_size, cfg.num_hidden_layers,
     )
 
-    operators = generate_model_operators(cfg, batch_size, seq_len, kv_cache_len)
+    # Generate only 1 representative layer (all layers are identical)
+    layer_ops = generate_layer_operators(cfg, 0, batch_size, seq_len, kv_cache_len)
+
+    # LM head
+    lm_head_op = _linear_op(
+        "lm_head",
+        in_features=cfg.hidden_size, out_features=cfg.vocab_size,
+        batch=batch_size * seq_len,
+        ifmap_name="final_norm_out",
+        filter_name="lm_head_weight",
+        ofmap_name="lm_head_out",
+    )
+
+    all_ops = layer_ops + [lm_head_op]
 
     # Include phase and dimensions in output directory name
     if phase == 'prefill':
@@ -447,13 +460,22 @@ def convert_llm(config_path: str, save_dir: str,
     outdir = os.path.join(save_dir, f"{cfg.model_name}_{phase_suffix}")
     os.makedirs(outdir, exist_ok=True)
 
-    for i, op in enumerate(operators):
+    # Write operator YAMLs (1 layer + lm_head only)
+    for op in all_ops:
         fname = f"{op.name}.yaml"
         fpath = os.path.join(outdir, fname)
         with open(fpath, 'w') as f:
             yaml.dump(op.to_yaml(), f, default_flow_style=False)
 
-    print(f"Generated {len(operators)} operator YAML files in {outdir}/")
+    # Write network description file
+    _write_network_description(cfg, outdir, phase, seq_len, kv_cache_len,
+                               batch_size, layer_ops, lm_head_op)
+
+    n_layer_ops = len(layer_ops)
+    n_files = len(all_ops)
+    total_ops = n_layer_ops * cfg.num_hidden_layers + 1
+
+    print(f"Generated {n_files} YAML files in {outdir}/")
     print(f"  Phase: {phase}")
     if phase == 'prefill':
         print(f"  seq_len={seq_len}, batch_size={batch_size}")
@@ -462,17 +484,78 @@ def convert_llm(config_path: str, save_dir: str,
         print(f"  seq_len=1 (new token), kv_cache_len={kv_cache_len}, "
               f"batch_size={batch_size}")
         print(f"  Attention: Q@K^T is (1 x {kv_cache_len})")
-        print(f"  Linear projections: same as prefill but N=B*1={batch_size}")
+    print(f"  1 representative layer ({n_layer_ops} ops) x "
+          f"{cfg.num_hidden_layers} identical layers = {total_ops - 1} total ops")
+    print(f"  + 1 lm_head = {total_ops} total ops")
+    print(f"  See {outdir}/NETWORK.yaml for full network description")
 
-    if cfg.is_moe:
-        ops_per_layer = 6 + 1 + 3 * cfg.num_experts
-        print(f"  MoE: {cfg.num_experts} experts, top-{cfg.num_experts_per_tok}")
-        print(f"  Per layer: {ops_per_layer} ops x {cfg.num_hidden_layers} layers")
+    return all_ops
+
+
+def _write_network_description(cfg, outdir, phase, seq_len, kv_cache_len,
+                                batch_size, layer_ops, lm_head_op):
+    """Write a YAML file describing the full network structure."""
+    if phase == 'prefill':
+        phase_desc = f"prefill (seq_len={seq_len})"
+        attn_desc = f"Q@K^T: ({seq_len} x {seq_len})"
     else:
-        print(f"  Per layer: 9 ops x {cfg.num_hidden_layers} layers")
-    print(f"  + 1 lm_head")
+        phase_desc = f"decode (kv_cache_len={kv_cache_len})"
+        attn_desc = f"Q@K^T: (1 x {kv_cache_len})"
 
-    return operators
+    n_layer_ops = len(layer_ops)
+
+    # Build layer operator list
+    layer_op_names = [op.name for op in layer_ops]
+
+    # Build MoE info if applicable
+    moe_info = None
+    if cfg.is_moe:
+        moe_info = {
+            'num_experts': cfg.num_experts,
+            'num_experts_per_tok': cfg.num_experts_per_tok,
+            'moe_intermediate_size': cfg.moe_intermediate_size,
+            'tokens_per_expert': f"B*S*{cfg.num_experts_per_tok}/{cfg.num_experts} "
+                                 f"= {batch_size * seq_len * cfg.num_experts_per_tok // max(cfg.num_experts, 1)} "
+                                 f"(uniform routing)",
+        }
+
+    desc = {
+        'network': {
+            'model_name': cfg.model_name,
+            'phase': phase_desc,
+            'batch_size': batch_size,
+            'attention': attn_desc,
+        },
+        'architecture': {
+            'hidden_size': cfg.hidden_size,
+            'num_attention_heads': cfg.num_attention_heads,
+            'num_key_value_heads': cfg.num_key_value_heads,
+            'head_dim': cfg.head_dim,
+            'intermediate_size': cfg.intermediate_size,
+            'vocab_size': cfg.vocab_size,
+            'num_hidden_layers': cfg.num_hidden_layers,
+        },
+        'structure': {
+            'description': (
+                f"All {cfg.num_hidden_layers} decoder layers have identical "
+                f"operator dimensions. Only layer 0 YAMLs are stored. "
+                f"To get the full network, repeat layer 0 operators "
+                f"{cfg.num_hidden_layers} times, then append lm_head."
+            ),
+            'total_operators': n_layer_ops * cfg.num_hidden_layers + 1,
+            'operators_per_layer': n_layer_ops,
+            'num_layers': cfg.num_hidden_layers,
+            'layer_operators': layer_op_names,
+            'global_operators': ['lm_head'],
+        },
+    }
+
+    if moe_info:
+        desc['architecture']['moe'] = moe_info
+
+    fpath = os.path.join(outdir, 'NETWORK.yaml')
+    with open(fpath, 'w') as f:
+        yaml.dump(desc, f, default_flow_style=False, sort_keys=False)
 
 
 # ============================================================

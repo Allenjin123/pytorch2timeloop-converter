@@ -1,0 +1,32 @@
+network:
+  model_name: llama3.1_8b
+  phase: decode (kv_cache_len=1024)
+  batch_size: 1
+  attention: 'Q@K^T: (1 x 1024)'
+architecture:
+  hidden_size: 4096
+  num_attention_heads: 32
+  num_key_value_heads: 8
+  head_dim: 128
+  intermediate_size: 14336
+  vocab_size: 128256
+  num_hidden_layers: 32
+structure:
+  description: All 32 decoder layers have identical operator dimensions. Only layer
+    0 YAMLs are stored. To get the full network, repeat layer 0 operators 32 times,
+    then append lm_head.
+  total_operators: 289
+  operators_per_layer: 9
+  num_layers: 32
+  layer_operators:
+  - layer0_q_proj
+  - layer0_k_proj
+  - layer0_v_proj
+  - layer0_attn_qk
+  - layer0_attn_v
+  - layer0_o_proj
+  - layer0_gate_proj
+  - layer0_up_proj
+  - layer0_down_proj
+  global_operators:
+  - lm_head
