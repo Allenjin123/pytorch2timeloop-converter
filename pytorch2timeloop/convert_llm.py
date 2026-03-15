@@ -437,8 +437,49 @@ def convert_llm(config_path: str, save_dir: str,
         cfg.vocab_size, cfg.num_hidden_layers,
     )
 
-    # Generate only 1 representative layer (all layers are identical)
-    layer_ops = generate_layer_operators(cfg, 0, batch_size, seq_len, kv_cache_len)
+    # Generate unique operators only.
+    # All layers are identical, and within a layer:
+    #   k_proj == v_proj, gate_proj == up_proj, all experts are identical.
+    # We store only unique YAMLs and describe duplication in NETWORK.yaml.
+
+    attn_ops = _generate_attention_operators(cfg, 0, batch_size, seq_len, kv_cache_len)
+
+    # Deduplicate: remove v_proj (same dims as k_proj)
+    unique_attn = [op for op in attn_ops if 'v_proj' not in op.name]
+
+    # MLP ops
+    if cfg.is_moe:
+        H = cfg.hidden_size
+        E_I = cfg.moe_intermediate_size
+        n_exp = cfg.num_experts
+        top_k = cfg.num_experts_per_tok
+        BS = batch_size * seq_len
+        tokens_per_expert = max((BS * top_k) // n_exp, 1)
+
+        # Router (unique)
+        router_op = _linear_op(
+            "router", in_features=H, out_features=n_exp, batch=BS,
+            ifmap_name="ln2_out", filter_name="router_weight",
+            ofmap_name="router_out",
+        )
+        # One representative expert: gate_proj (= up_proj) and down_proj
+        expert_gate = _linear_op(
+            "expert_gate_proj", in_features=H, out_features=E_I,
+            batch=tokens_per_expert,
+            ifmap_name="router_out", filter_name="expert_gate_proj_weight",
+            ofmap_name="expert_gate_proj_out",
+        )
+        expert_down = _linear_op(
+            "expert_down_proj", in_features=E_I, out_features=H,
+            batch=tokens_per_expert,
+            ifmap_name="expert_gate_up_out", filter_name="expert_down_proj_weight",
+            ofmap_name="expert_down_proj_out",
+        )
+        unique_mlp = [router_op, expert_gate, expert_down]
+    else:
+        mlp_ops = _generate_dense_mlp_operators(cfg, 0, batch_size, seq_len)
+        # Deduplicate: remove up_proj (same dims as gate_proj)
+        unique_mlp = [op for op in mlp_ops if 'up_proj' not in op.name]
 
     # LM head
     lm_head_op = _linear_op(
@@ -450,7 +491,7 @@ def convert_llm(config_path: str, save_dir: str,
         ofmap_name="lm_head_out",
     )
 
-    all_ops = layer_ops + [lm_head_op]
+    unique_ops = unique_attn + unique_mlp + [lm_head_op]
 
     # Include phase and dimensions in output directory name
     if phase == 'prefill':
@@ -460,8 +501,8 @@ def convert_llm(config_path: str, save_dir: str,
     outdir = os.path.join(save_dir, f"{cfg.model_name}_{phase_suffix}")
     os.makedirs(outdir, exist_ok=True)
 
-    # Write operator YAMLs (1 layer + lm_head only)
-    for op in all_ops:
+    # Write only unique operator YAMLs
+    for op in unique_ops:
         fname = f"{op.name}.yaml"
         fpath = os.path.join(outdir, fname)
         with open(fpath, 'w') as f:
@@ -469,13 +510,9 @@ def convert_llm(config_path: str, save_dir: str,
 
     # Write network description file
     _write_network_description(cfg, outdir, phase, seq_len, kv_cache_len,
-                               batch_size, layer_ops, lm_head_op)
+                               batch_size, unique_ops)
 
-    n_layer_ops = len(layer_ops)
-    n_files = len(all_ops)
-    total_ops = n_layer_ops * cfg.num_hidden_layers + 1
-
-    print(f"Generated {n_files} YAML files in {outdir}/")
+    print(f"Generated {len(unique_ops)} unique YAML files in {outdir}/")
     print(f"  Phase: {phase}")
     if phase == 'prefill':
         print(f"  seq_len={seq_len}, batch_size={batch_size}")
@@ -484,16 +521,13 @@ def convert_llm(config_path: str, save_dir: str,
         print(f"  seq_len=1 (new token), kv_cache_len={kv_cache_len}, "
               f"batch_size={batch_size}")
         print(f"  Attention: Q@K^T is (1 x {kv_cache_len})")
-    print(f"  1 representative layer ({n_layer_ops} ops) x "
-          f"{cfg.num_hidden_layers} identical layers = {total_ops - 1} total ops")
-    print(f"  + 1 lm_head = {total_ops} total ops")
     print(f"  See {outdir}/NETWORK.yaml for full network description")
 
-    return all_ops
+    return unique_ops
 
 
 def _write_network_description(cfg, outdir, phase, seq_len, kv_cache_len,
-                                batch_size, layer_ops, lm_head_op):
+                                batch_size, unique_ops):
     """Write a YAML file describing the full network structure."""
     if phase == 'prefill':
         phase_desc = f"prefill (seq_len={seq_len})"
@@ -502,22 +536,62 @@ def _write_network_description(cfg, outdir, phase, seq_len, kv_cache_len,
         phase_desc = f"decode (kv_cache_len={kv_cache_len})"
         attn_desc = f"Q@K^T: (1 x {kv_cache_len})"
 
-    n_layer_ops = len(layer_ops)
+    unique_names = [op.name for op in unique_ops]
 
-    # Build layer operator list
-    layer_op_names = [op.name for op in layer_ops]
-
-    # Build MoE info if applicable
-    moe_info = None
+    # Build the per-layer operator sequence with duplication info
     if cfg.is_moe:
-        moe_info = {
-            'num_experts': cfg.num_experts,
-            'num_experts_per_tok': cfg.num_experts_per_tok,
-            'moe_intermediate_size': cfg.moe_intermediate_size,
-            'tokens_per_expert': f"B*S*{cfg.num_experts_per_tok}/{cfg.num_experts} "
-                                 f"= {batch_size * seq_len * cfg.num_experts_per_tok // max(cfg.num_experts, 1)} "
-                                 f"(uniform routing)",
-        }
+        n_exp = cfg.num_experts
+        top_k = cfg.num_experts_per_tok
+        tokens_per_expert = max(
+            (batch_size * seq_len * top_k) // n_exp, 1
+        )
+        ops_per_layer = 6 + 1 + 3 * n_exp  # attn + router + expert MLPs
+        layer_sequence = [
+            {'yaml': 'q_proj.yaml', 'count': 1,
+             'description': f'Query projection: (B*S, {cfg.hidden_size}) @ ({cfg.hidden_size}, {cfg.num_attention_heads * cfg.head_dim})'},
+            {'yaml': 'k_proj.yaml', 'count': 1,
+             'description': f'Key projection: (B*S, {cfg.hidden_size}) @ ({cfg.hidden_size}, {cfg.num_key_value_heads * cfg.head_dim})'},
+            {'yaml': 'k_proj.yaml', 'count': 1, 'alias': 'v_proj',
+             'description': 'Value projection: same dimensions as k_proj (GQA)'},
+            {'yaml': 'attn_qk.yaml', 'count': 1,
+             'description': f'Attention scores: Q @ K^T, batched over {cfg.num_attention_heads} heads'},
+            {'yaml': 'attn_v.yaml', 'count': 1,
+             'description': 'Attention context: softmax(scores) @ V'},
+            {'yaml': 'o_proj.yaml', 'count': 1,
+             'description': f'Output projection: ({cfg.num_attention_heads * cfg.head_dim}) -> ({cfg.hidden_size})'},
+            {'yaml': 'router.yaml', 'count': 1,
+             'description': f'MoE router: scores each token against {n_exp} experts, selects top-{top_k}'},
+            {'yaml': 'expert_gate_proj.yaml', 'count': n_exp, 'alias': 'expert[0..127]_gate_proj',
+             'description': f'Expert gate projection: {n_exp} identical experts, each processes {tokens_per_expert} tokens'},
+            {'yaml': 'expert_gate_proj.yaml', 'count': n_exp, 'alias': 'expert[0..127]_up_proj',
+             'description': 'Expert up projection: same dimensions as expert_gate_proj (SwiGLU)'},
+            {'yaml': 'expert_down_proj.yaml', 'count': n_exp, 'alias': 'expert[0..127]_down_proj',
+             'description': f'Expert down projection: ({cfg.moe_intermediate_size}) -> ({cfg.hidden_size}), {n_exp} experts'},
+        ]
+    else:
+        ops_per_layer = 9
+        layer_sequence = [
+            {'yaml': 'layer0_q_proj.yaml', 'count': 1,
+             'description': f'Query projection: (B*S, {cfg.hidden_size}) @ ({cfg.hidden_size}, {cfg.num_attention_heads * cfg.head_dim})'},
+            {'yaml': 'layer0_k_proj.yaml', 'count': 1,
+             'description': f'Key projection: (B*S, {cfg.hidden_size}) @ ({cfg.hidden_size}, {cfg.num_key_value_heads * cfg.head_dim})'},
+            {'yaml': 'layer0_k_proj.yaml', 'count': 1, 'alias': 'v_proj',
+             'description': 'Value projection: same dimensions as k_proj (GQA)'},
+            {'yaml': 'layer0_attn_qk.yaml', 'count': 1,
+             'description': f'Attention scores: Q @ K^T, batched over {cfg.num_attention_heads} heads'},
+            {'yaml': 'layer0_attn_v.yaml', 'count': 1,
+             'description': 'Attention context: softmax(scores) @ V'},
+            {'yaml': 'layer0_o_proj.yaml', 'count': 1,
+             'description': f'Output projection: ({cfg.num_attention_heads * cfg.head_dim}) -> ({cfg.hidden_size})'},
+            {'yaml': 'layer0_gate_proj.yaml', 'count': 1,
+             'description': f'MLP gate projection: ({cfg.hidden_size}) -> ({cfg.intermediate_size}) with SiLU activation'},
+            {'yaml': 'layer0_gate_proj.yaml', 'count': 1, 'alias': 'up_proj',
+             'description': 'MLP up projection: same dimensions as gate_proj (SwiGLU)'},
+            {'yaml': 'layer0_down_proj.yaml', 'count': 1,
+             'description': f'MLP down projection: ({cfg.intermediate_size}) -> ({cfg.hidden_size})'},
+        ]
+
+    total_ops = ops_per_layer * cfg.num_hidden_layers + 1
 
     desc = {
         'network': {
@@ -531,27 +605,41 @@ def _write_network_description(cfg, outdir, phase, seq_len, kv_cache_len,
             'num_attention_heads': cfg.num_attention_heads,
             'num_key_value_heads': cfg.num_key_value_heads,
             'head_dim': cfg.head_dim,
+            'gqa_ratio': f'{cfg.num_attention_heads}Q / {cfg.num_key_value_heads}KV = {cfg.gqa_ratio}:1',
             'intermediate_size': cfg.intermediate_size,
             'vocab_size': cfg.vocab_size,
             'num_hidden_layers': cfg.num_hidden_layers,
         },
         'structure': {
             'description': (
-                f"All {cfg.num_hidden_layers} decoder layers have identical "
-                f"operator dimensions. Only layer 0 YAMLs are stored. "
-                f"To get the full network, repeat layer 0 operators "
-                f"{cfg.num_hidden_layers} times, then append lm_head."
+                f"Only unique operator YAMLs are stored. "
+                f"v_proj has the same dimensions as k_proj. "
+                + (f"up_proj has the same dimensions as gate_proj. "
+                   if not cfg.is_moe else
+                   f"expert_up_proj has the same dimensions as expert_gate_proj. "
+                   f"All {cfg.num_experts} experts have identical dimensions. ")
+                + f"All {cfg.num_hidden_layers} decoder layers are identical."
             ),
-            'total_operators': n_layer_ops * cfg.num_hidden_layers + 1,
-            'operators_per_layer': n_layer_ops,
+            'unique_yamls': unique_names,
+            'total_operators_in_model': total_ops,
+            'operators_per_layer': ops_per_layer,
             'num_layers': cfg.num_hidden_layers,
-            'layer_operators': layer_op_names,
-            'global_operators': ['lm_head'],
+            'layer_operator_sequence': layer_sequence,
+            'global_operators': [
+                {'yaml': 'lm_head.yaml', 'count': 1,
+                 'description': f'Language model head: ({cfg.hidden_size}) -> ({cfg.vocab_size})'}
+            ],
         },
     }
 
-    if moe_info:
-        desc['architecture']['moe'] = moe_info
+    if cfg.is_moe:
+        desc['architecture']['moe'] = {
+            'num_experts': cfg.num_experts,
+            'num_experts_per_tok': top_k,
+            'moe_intermediate_size': cfg.moe_intermediate_size,
+            'tokens_per_expert': f'{tokens_per_expert} (uniform routing: B*S*{top_k}/{n_exp})',
+            'total_params': f'{cfg.num_experts} experts (only {top_k} active per token)',
+        }
 
     fpath = os.path.join(outdir, 'NETWORK.yaml')
     with open(fpath, 'w') as f:
