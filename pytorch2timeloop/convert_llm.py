@@ -32,12 +32,199 @@ from pathlib import Path
 
 import yaml
 
-from pytorch2timeloop.utils.layer_descriptions import (
-    ConvLayerDescription,
-    MatmulFuncDescription,
-)
-
 logger = logging.getLogger(__name__)
+
+
+# ============================================================
+# LLM Operator Namespace
+# ============================================================
+#
+# Unified dimension naming for all LLM operators. Every physical
+# quantity has exactly one name, used consistently across all
+# operator types:
+#
+#   B    = batch size
+#   S    = sequence length (query length; 1 for decode)
+#   Cin  = input features  (e.g., hidden_size)
+#   Cout = output features (e.g., num_heads * head_dim)
+#   Nh   = number of attention heads (query heads)
+#   Sq   = query sequence length
+#   Sk   = key/value sequence length (= Sq for prefill, kv_cache_len for decode)
+#   D    = head dimension
+#
+# Data space naming:
+#   Linear:  Weights(Cout, Cin), Inputs(B, S, Cin), Outputs(B, S, Cout)
+#   Attn QK: Q(B, Nh, Sq, D), K(B, Nh, Sk, D), Scores(B, Nh, Sq, Sk)
+#   Attn V:  Scores(B, Nh, Sq, Sk), V(B, Nh, Sk, D), Context(B, Nh, Sq, D)
+#
+
+
+@dataclass
+class LLMLinearOp:
+    """Linear projection operator with LLM-semantic dimensions."""
+    name: str
+    batch: int
+    seq_len: int
+    in_features: int
+    out_features: int
+
+    def to_yaml(self):
+        return {
+            'problem': {
+                'shape': {
+                    'name': self.name,
+                    'dimensions': ['B', 'S', 'Cin', 'Cout'],
+                    'data_spaces': [
+                        {
+                            'name': 'Weights',
+                            'projection': [
+                                [['Cout']],
+                                [['Cin']],
+                            ],
+                        },
+                        {
+                            'name': 'Inputs',
+                            'projection': [
+                                [['B']],
+                                [['S']],
+                                [['Cin']],
+                            ],
+                        },
+                        {
+                            'name': 'Outputs',
+                            'projection': [
+                                [['B']],
+                                [['S']],
+                                [['Cout']],
+                            ],
+                            'read_write': True,
+                        },
+                    ],
+                },
+                'instance': {
+                    'B': self.batch,
+                    'S': self.seq_len,
+                    'Cin': self.in_features,
+                    'Cout': self.out_features,
+                },
+            },
+        }
+
+
+@dataclass
+class LLMAttentionQKOp:
+    """Attention Q @ K^T operator with LLM-semantic dimensions."""
+    name: str
+    batch: int
+    num_heads: int
+    q_seq_len: int
+    kv_seq_len: int
+    head_dim: int
+
+    def to_yaml(self):
+        return {
+            'problem': {
+                'shape': {
+                    'name': self.name,
+                    'dimensions': ['B', 'Nh', 'Sq', 'Sk', 'D'],
+                    'data_spaces': [
+                        {
+                            'name': 'Q',
+                            'projection': [
+                                [['B']],
+                                [['Nh']],
+                                [['Sq']],
+                                [['D']],
+                            ],
+                        },
+                        {
+                            'name': 'K',
+                            'projection': [
+                                [['B']],
+                                [['Nh']],
+                                [['Sk']],
+                                [['D']],
+                            ],
+                        },
+                        {
+                            'name': 'Scores',
+                            'projection': [
+                                [['B']],
+                                [['Nh']],
+                                [['Sq']],
+                                [['Sk']],
+                            ],
+                            'read_write': True,
+                        },
+                    ],
+                },
+                'instance': {
+                    'B': self.batch,
+                    'Nh': self.num_heads,
+                    'Sq': self.q_seq_len,
+                    'Sk': self.kv_seq_len,
+                    'D': self.head_dim,
+                },
+            },
+        }
+
+
+@dataclass
+class LLMAttentionVOp:
+    """Attention softmax(Scores) @ V operator with LLM-semantic dimensions."""
+    name: str
+    batch: int
+    num_heads: int
+    q_seq_len: int
+    kv_seq_len: int
+    head_dim: int
+
+    def to_yaml(self):
+        return {
+            'problem': {
+                'shape': {
+                    'name': self.name,
+                    'dimensions': ['B', 'Nh', 'Sq', 'Sk', 'D'],
+                    'data_spaces': [
+                        {
+                            'name': 'Scores',
+                            'projection': [
+                                [['B']],
+                                [['Nh']],
+                                [['Sq']],
+                                [['Sk']],
+                            ],
+                        },
+                        {
+                            'name': 'V',
+                            'projection': [
+                                [['B']],
+                                [['Nh']],
+                                [['Sk']],
+                                [['D']],
+                            ],
+                        },
+                        {
+                            'name': 'Context',
+                            'projection': [
+                                [['B']],
+                                [['Nh']],
+                                [['Sq']],
+                                [['D']],
+                            ],
+                            'read_write': True,
+                        },
+                    ],
+                },
+                'instance': {
+                    'B': self.batch,
+                    'Nh': self.num_heads,
+                    'Sq': self.q_seq_len,
+                    'Sk': self.kv_seq_len,
+                    'D': self.head_dim,
+                },
+            },
+        }
 
 
 @dataclass
@@ -120,30 +307,38 @@ class LLMConfig:
         )
 
 
-def _linear_op(name, in_features, out_features, batch,
-               ifmap_name, filter_name, ofmap_name):
-    """Create a ConvLayerDescription modeling a Linear layer as 1x1 conv."""
-    return ConvLayerDescription(
-        name=name, g=1,
-        c=in_features, m=out_features,
-        w=1, h=1, s=1, r=1,
-        w_stride=1, h_stride=1, w_pad=0, h_pad=0,
-        n=batch,
-        ifmap_name=ifmap_name,
-        filter_name=filter_name,
-        ofmap_name=ofmap_name,
+def _linear_op(name, batch, seq_len, in_features, out_features):
+    """Create an LLMLinearOp with LLM-semantic dimensions."""
+    return LLMLinearOp(
+        name=name,
+        batch=batch,
+        seq_len=seq_len,
+        in_features=in_features,
+        out_features=out_features,
     )
 
 
-def _batched_matmul_op(name, m, k, n, batch_dims,
-                       ifmap1_name, ifmap2_name, ofmap_name):
-    """Create a MatmulFuncDescription for a batched matmul."""
-    return MatmulFuncDescription(
-        name=name, m=m, k=k, n=n,
-        ifmap1_name=ifmap1_name,
-        ifmap2_name=ifmap2_name,
-        ofmap_name=ofmap_name,
-        extra_dims=batch_dims,
+def _attn_qk_op(name, batch, num_heads, q_seq_len, kv_seq_len, head_dim):
+    """Create an LLMAttentionQKOp (Q @ K^T)."""
+    return LLMAttentionQKOp(
+        name=name,
+        batch=batch,
+        num_heads=num_heads,
+        q_seq_len=q_seq_len,
+        kv_seq_len=kv_seq_len,
+        head_dim=head_dim,
+    )
+
+
+def _attn_v_op(name, batch, num_heads, q_seq_len, kv_seq_len, head_dim):
+    """Create an LLMAttentionVOp (softmax(Scores) @ V)."""
+    return LLMAttentionVOp(
+        name=name,
+        batch=batch,
+        num_heads=num_heads,
+        q_seq_len=q_seq_len,
+        kv_seq_len=kv_seq_len,
+        head_dim=head_dim,
     )
 
 
@@ -163,74 +358,33 @@ def _generate_attention_operators(cfg: LLMConfig, layer_idx: int,
     n_h = cfg.num_attention_heads
     n_kv = cfg.num_key_value_heads
     d = cfg.head_dim
-    BS = batch_size * seq_len
+    S = seq_len
+    B = batch_size
     L = f"layer{layer_idx}"
+
+    Sq = S
+    Sk = kv_cache_len if kv_cache_len is not None else S
 
     ops = []
 
-    # Q projection: (B*S, H) @ (H, n_h*d)
-    # Prefill: S = prompt_len tokens. Decode: S = 1 new token.
-    ops.append(_linear_op(
-        f"{L}_q_proj", in_features=H, out_features=n_h * d, batch=BS,
-        ifmap_name=f"{L}_ln1_out",
-        filter_name=f"{L}_q_proj_weight",
-        ofmap_name=f"{L}_q_proj_out",
-    ))
+    # Q projection: (B, S, H) -> (B, S, n_h*d)
+    ops.append(_linear_op(f"{L}_q_proj", B, S, H, n_h * d))
 
-    # K projection: (B*S, H) @ (H, n_kv*d)
-    # Decode: only project the 1 new token (cached K from prior steps)
-    ops.append(_linear_op(
-        f"{L}_k_proj", in_features=H, out_features=n_kv * d, batch=BS,
-        ifmap_name=f"{L}_ln1_out",
-        filter_name=f"{L}_k_proj_weight",
-        ofmap_name=f"{L}_k_proj_out",
-    ))
+    # K projection: (B, S, H) -> (B, S, n_kv*d)
+    ops.append(_linear_op(f"{L}_k_proj", B, S, H, n_kv * d))
 
-    # V projection: (B*S, H) @ (H, n_kv*d)
-    ops.append(_linear_op(
-        f"{L}_v_proj", in_features=H, out_features=n_kv * d, batch=BS,
-        ifmap_name=f"{L}_ln1_out",
-        filter_name=f"{L}_v_proj_weight",
-        ofmap_name=f"{L}_v_proj_out",
-    ))
+    # V projection: (B, S, H) -> (B, S, n_kv*d)
+    ops.append(_linear_op(f"{L}_v_proj", B, S, H, n_kv * d))
 
-    if kv_cache_len is not None:
-        # Decode phase: Q is (B, n_h, 1, d), K is (B, n_h, d, kv_cache_len)
-        # Q@K^T: (B*n_h, 1, d) @ (B*n_h, d, kv_cache_len) -> (B*n_h, 1, kv_cache_len)
-        q_len = seq_len  # typically 1
-        k_len = kv_cache_len
-    else:
-        # Prefill phase: Q and K both have seq_len entries
-        q_len = seq_len
-        k_len = seq_len
-
-    # Attention scores: Q @ K^T
+    # Attention scores: Q(B, Nh, Sq, D) @ K^T(B, Nh, D, Sk) -> Scores(B, Nh, Sq, Sk)
     # KV heads are broadcast to n_h via GQA repeat; KV reuse is a mapping concern.
-    ops.append(_batched_matmul_op(
-        f"{L}_attn_qk", m=q_len, k=d, n=k_len,
-        batch_dims=(batch_size * n_h,),
-        ifmap1_name=f"{L}_q_proj_out",
-        ifmap2_name=f"{L}_k_proj_out",
-        ofmap_name=f"{L}_attn_qk_out",
-    ))
+    ops.append(_attn_qk_op(f"{L}_attn_qk", B, n_h, Sq, Sk, d))
 
-    # Attention context: softmax(scores) @ V
-    # (B*n_h, q_len, k_len) @ (B*n_h, k_len, d) -> (B*n_h, q_len, d)
-    ops.append(_batched_matmul_op(
-        f"{L}_attn_v", m=q_len, k=k_len, n=d,
-        batch_dims=(batch_size * n_h,),
-        ifmap1_name=f"{L}_attn_qk_out",
-        ifmap2_name=f"{L}_v_proj_out",
-        ofmap_name=f"{L}_attn_v_out",
-    ))
+    # Attention context: Scores(B, Nh, Sq, Sk) @ V(B, Nh, Sk, D) -> Context(B, Nh, Sq, D)
+    ops.append(_attn_v_op(f"{L}_attn_v", B, n_h, Sq, Sk, d))
 
-    # O projection: (B*S, n_h*d) @ (n_h*d, H)
-    ops.append(_linear_op(
-        f"{L}_o_proj", in_features=n_h * d, out_features=H, batch=BS,
-        ifmap_name=f"{L}_attn_v_out",
-        filter_name=f"{L}_o_proj_weight",
-        ofmap_name=f"{L}_o_proj_out",
-    ))
+    # O projection: (B, S, n_h*d) -> (B, S, H)
+    ops.append(_linear_op(f"{L}_o_proj", B, S, n_h * d, H))
 
     return ops
 
@@ -240,28 +394,14 @@ def _generate_dense_mlp_operators(cfg: LLMConfig, layer_idx: int,
     """Generate dense MLP block operators (gate_proj, up_proj, down_proj)."""
     H = cfg.hidden_size
     I = cfg.intermediate_size
-    BS = batch_size * seq_len
+    B = batch_size
+    S = seq_len
     L = f"layer{layer_idx}"
 
     return [
-        _linear_op(
-            f"{L}_gate_proj", in_features=H, out_features=I, batch=BS,
-            ifmap_name=f"{L}_ln2_out",
-            filter_name=f"{L}_gate_proj_weight",
-            ofmap_name=f"{L}_gate_proj_out",
-        ),
-        _linear_op(
-            f"{L}_up_proj", in_features=H, out_features=I, batch=BS,
-            ifmap_name=f"{L}_ln2_out",
-            filter_name=f"{L}_up_proj_weight",
-            ofmap_name=f"{L}_up_proj_out",
-        ),
-        _linear_op(
-            f"{L}_down_proj", in_features=I, out_features=H, batch=BS,
-            ifmap_name=f"{L}_gate_up_out",
-            filter_name=f"{L}_down_proj_weight",
-            ofmap_name=f"{L}_down_proj_out",
-        ),
+        _linear_op(f"{L}_gate_proj", B, S, H, I),
+        _linear_op(f"{L}_up_proj", B, S, H, I),
+        _linear_op(f"{L}_down_proj", B, S, I, H),
     ]
 
 
@@ -279,57 +419,31 @@ def _generate_moe_mlp_operators(cfg: LLMConfig, layer_idx: int,
     generate one representative expert and annotate the count.
     """
     H = cfg.hidden_size
-    E_I = cfg.moe_intermediate_size   # per-expert intermediate size
+    E_I = cfg.moe_intermediate_size
     n_exp = cfg.num_experts
     top_k = cfg.num_experts_per_tok
-    BS = batch_size * seq_len
+    B = batch_size
+    S = seq_len
     L = f"layer{layer_idx}"
 
     # Tokens per expert (uniform routing assumption)
-    tokens_per_expert = (BS * top_k) // n_exp
-    # Handle case where not evenly divisible
+    # S_expert = total_tokens * top_k / num_experts
+    tokens_per_expert = (B * S * top_k) // n_exp
     if tokens_per_expert == 0:
         tokens_per_expert = 1
 
     ops = []
 
-    # Router: (B*S, H) @ (H, num_experts)
-    ops.append(_linear_op(
-        f"{L}_router", in_features=H, out_features=n_exp, batch=BS,
-        ifmap_name=f"{L}_ln2_out",
-        filter_name=f"{L}_router_weight",
-        ofmap_name=f"{L}_router_out",
-    ))
+    # Router: (B, S, H) -> (B, S, num_experts)
+    ops.append(_linear_op(f"{L}_router", B, S, H, n_exp))
 
     # Expert MLPs: each expert processes tokens_per_expert tokens
-    # All experts are identical in dimensions — generate each independently
-    # so the DSE can map them to different hardware units
     for exp_idx in range(n_exp):
         E = f"{L}_expert{exp_idx}"
-
-        ops.append(_linear_op(
-            f"{E}_gate_proj", in_features=H, out_features=E_I,
-            batch=tokens_per_expert,
-            ifmap_name=f"{L}_router_out",
-            filter_name=f"{E}_gate_proj_weight",
-            ofmap_name=f"{E}_gate_proj_out",
-        ))
-
-        ops.append(_linear_op(
-            f"{E}_up_proj", in_features=H, out_features=E_I,
-            batch=tokens_per_expert,
-            ifmap_name=f"{L}_router_out",
-            filter_name=f"{E}_up_proj_weight",
-            ofmap_name=f"{E}_up_proj_out",
-        ))
-
-        ops.append(_linear_op(
-            f"{E}_down_proj", in_features=E_I, out_features=H,
-            batch=tokens_per_expert,
-            ifmap_name=f"{E}_gate_up_out",
-            filter_name=f"{E}_down_proj_weight",
-            ofmap_name=f"{E}_down_proj_out",
-        ))
+        # B=1, S=tokens_per_expert for expert linear ops
+        ops.append(_linear_op(f"{E}_gate_proj", 1, tokens_per_expert, H, E_I))
+        ops.append(_linear_op(f"{E}_up_proj", 1, tokens_per_expert, H, E_I))
+        ops.append(_linear_op(f"{E}_down_proj", 1, tokens_per_expert, E_I, H))
 
     return ops
 
@@ -380,15 +494,9 @@ def generate_model_operators(cfg: LLMConfig,
             cfg, layer_idx, batch_size, seq_len, kv_cache_len
         ))
 
-    # LM head: (B*S, H) @ (H, V)
-    ops.append(_linear_op(
-        "lm_head",
-        in_features=cfg.hidden_size, out_features=cfg.vocab_size,
-        batch=batch_size * seq_len,
-        ifmap_name="final_norm_out",
-        filter_name="lm_head_weight",
-        ofmap_name="lm_head_out",
-    ))
+    # LM head: (B, S, H) -> (B, S, V)
+    ops.append(_linear_op("lm_head", batch_size, seq_len,
+                           cfg.hidden_size, cfg.vocab_size))
 
     return ops
 
@@ -453,28 +561,13 @@ def convert_llm(config_path: str, save_dir: str,
         E_I = cfg.moe_intermediate_size
         n_exp = cfg.num_experts
         top_k = cfg.num_experts_per_tok
-        BS = batch_size * seq_len
-        tokens_per_expert = max((BS * top_k) // n_exp, 1)
+        tokens_per_expert = max((batch_size * seq_len * top_k) // n_exp, 1)
 
         # Router (unique)
-        router_op = _linear_op(
-            "router", in_features=H, out_features=n_exp, batch=BS,
-            ifmap_name="ln2_out", filter_name="router_weight",
-            ofmap_name="router_out",
-        )
+        router_op = _linear_op("router", batch_size, seq_len, H, n_exp)
         # One representative expert: gate_proj (= up_proj) and down_proj
-        expert_gate = _linear_op(
-            "expert_gate_proj", in_features=H, out_features=E_I,
-            batch=tokens_per_expert,
-            ifmap_name="router_out", filter_name="expert_gate_proj_weight",
-            ofmap_name="expert_gate_proj_out",
-        )
-        expert_down = _linear_op(
-            "expert_down_proj", in_features=E_I, out_features=H,
-            batch=tokens_per_expert,
-            ifmap_name="expert_gate_up_out", filter_name="expert_down_proj_weight",
-            ofmap_name="expert_down_proj_out",
-        )
+        expert_gate = _linear_op("expert_gate_proj", 1, tokens_per_expert, H, E_I)
+        expert_down = _linear_op("expert_down_proj", 1, tokens_per_expert, E_I, H)
         unique_mlp = [router_op, expert_gate, expert_down]
     else:
         mlp_ops = _generate_dense_mlp_operators(cfg, 0, batch_size, seq_len)
@@ -482,14 +575,8 @@ def convert_llm(config_path: str, save_dir: str,
         unique_mlp = [op for op in mlp_ops if 'up_proj' not in op.name]
 
     # LM head
-    lm_head_op = _linear_op(
-        "lm_head",
-        in_features=cfg.hidden_size, out_features=cfg.vocab_size,
-        batch=batch_size * seq_len,
-        ifmap_name="final_norm_out",
-        filter_name="lm_head_weight",
-        ofmap_name="lm_head_out",
-    )
+    lm_head_op = _linear_op("lm_head", batch_size, seq_len,
+                             cfg.hidden_size, cfg.vocab_size)
 
     unique_ops = unique_attn + unique_mlp + [lm_head_op]
 

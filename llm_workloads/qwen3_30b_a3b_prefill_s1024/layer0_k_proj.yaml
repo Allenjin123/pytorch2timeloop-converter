@@ -1,59 +1,29 @@
 problem:
   instance:
-    C: 2048
-    G: 1
-    M: 512
-    N: 1024
-    P: 1
-    Q: 1
-    R: 1
-    S: 1
+    B: 1
+    Cin: 2048
+    Cout: 512
+    S: 1024
   shape:
-    coefficients:
-    - default: 2048
-      name: Cgroup
-    - default: 512
-      name: Mgroup
-    - default: 1
-      name: Hstride
-    - default: 1
-      name: Wstride
     data_spaces:
     - name: Weights
       projection:
-      - - - G
-      - - - C
-      - - - M
-      - - - R
-      - - - S
+      - - - Cout
+      - - - Cin
     - name: Inputs
       projection:
-      - - - N
-      - - - G
-          - Cgroup
-        - - C
-      - - - R
-        - - P
-          - Hstride
+      - - - B
       - - - S
-        - - Q
-          - Wstride
+      - - - Cin
     - name: Outputs
       projection:
-      - - - N
-      - - - G
-          - Mgroup
-        - - M
-      - - - P
-      - - - Q
+      - - - B
+      - - - S
+      - - - Cout
       read_write: true
     dimensions:
-    - G
-    - C
-    - M
-    - R
+    - B
     - S
-    - N
-    - P
-    - Q
+    - Cin
+    - Cout
     name: layer0_k_proj

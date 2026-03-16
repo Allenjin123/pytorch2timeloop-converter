@@ -1,29 +1,35 @@
 problem:
   instance:
-    A: 32
-    K: 4096
-    M: 1
-    N: 128
+    B: 1
+    D: 128
+    Nh: 32
+    Sk: 4096
+    Sq: 1
   shape:
     data_spaces:
-    - name: Input1
+    - name: Scores
       projection:
-      - - - A
-      - - - M
-      - - - K
-    - name: Input2
+      - - - B
+      - - - Nh
+      - - - Sq
+      - - - Sk
+    - name: V
       projection:
-      - - - A
-      - - - K
-      - - - N
-    - name: Outputs
+      - - - B
+      - - - Nh
+      - - - Sk
+      - - - D
+    - name: Context
       projection:
-      - - - A
-      - - - M
-      - - - N
+      - - - B
+      - - - Nh
+      - - - Sq
+      - - - D
       read_write: true
     dimensions:
-    - M
-    - N
-    - K
+    - B
+    - Nh
+    - Sq
+    - Sk
+    - D
     name: layer0_attn_v
