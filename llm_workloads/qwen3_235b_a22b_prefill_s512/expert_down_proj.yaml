@@ -1,9 +1,9 @@
 problem:
   instance:
-    B: 1
+    B: 32
     Cin: 1536
     Cout: 4096
-    S: 32
+    S: 1
   shape:
     data_spaces:
     - name: Inputs1
