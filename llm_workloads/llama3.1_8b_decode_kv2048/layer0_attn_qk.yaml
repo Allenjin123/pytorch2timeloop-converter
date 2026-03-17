@@ -2,34 +2,34 @@ problem:
   instance:
     B: 1
     D: 128
-    Nh: 32
-    Sk: 2048
-    Sq: 1
+    H: 32
+    K: 2048
+    Q: 1
   shape:
     data_spaces:
     - name: Inputs1
       projection:
       - - - B
-      - - - Nh
-      - - - Sq
+      - - - H
+      - - - Q
       - - - D
     - name: Inputs2
       projection:
       - - - B
-      - - - Nh
-      - - - Sk
+      - - - H
+      - - - K
       - - - D
     - name: Outputs
       projection:
       - - - B
-      - - - Nh
-      - - - Sq
-      - - - Sk
+      - - - H
+      - - - Q
+      - - - K
       read_write: true
     dimensions:
     - B
-    - Nh
-    - Sq
-    - Sk
+    - H
+    - Q
+    - K
     - D
     name: layer0_attn_qk

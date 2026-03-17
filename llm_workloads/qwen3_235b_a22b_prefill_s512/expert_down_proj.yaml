@@ -1,29 +1,29 @@
 problem:
   instance:
     B: 1
-    Cin: 1536
-    Cout: 4096
-    S: 32
+    C: 1536
+    M: 4096
+    N: 32
   shape:
     data_spaces:
     - name: Inputs1
       projection:
-      - - - Cout
-      - - - Cin
+      - - - M
+      - - - C
     - name: Inputs2
       projection:
       - - - B
-      - - - S
-      - - - Cin
+      - - - N
+      - - - C
     - name: Outputs
       projection:
       - - - B
-      - - - S
-      - - - Cout
+      - - - N
+      - - - M
       read_write: true
     dimensions:
     - B
-    - S
-    - Cin
-    - Cout
+    - N
+    - C
+    - M
     name: expert_down_proj

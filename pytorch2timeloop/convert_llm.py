@@ -36,32 +36,30 @@ logger = logging.getLogger(__name__)
 
 
 # ============================================================
-# LLM Operator Namespace
+# LLM Operator Namespace (single-char, Timeloop-compatible)
 # ============================================================
 #
-# Unified dimension naming for all LLM operators. Every physical
-# quantity has exactly one name, used consistently across all
-# operator types:
+#   Linear ops: [B, N, C, M]
+#     B = batch size
+#     N = number of tokens processed
+#     C = input features
+#     M = output features
 #
-#   B    = batch size
-#   S    = sequence length (query length; 1 for decode)
-#   Cin  = input features  (e.g., hidden_size)
-#   Cout = output features (e.g., num_heads * head_dim)
-#   Nh   = number of attention heads (query heads)
-#   Sq   = query sequence length
-#   Sk   = key/value sequence length (= Sq for prefill, kv_cache_len for decode)
-#   D    = head dimension
+#   Attention ops: [B, H, Q, K, D]
+#     B = batch size
+#     H = number of attention heads
+#     Q = query sequence length
+#     K = key/value sequence length
+#     D = head dimension
 #
-# Data space naming (consistent across all operators):
-#   Inputs1 = first input operand (Weights / Q / Scores)
-#   Inputs2 = second input operand (Inputs / K / V)
-#   Outputs = output (Outputs / Scores / Context)
+#   Data spaces (all operators):
+#     Inputs1, Inputs2, Outputs
 #
 
 
 @dataclass
 class LLMLinearOp:
-    """Linear projection operator with LLM-semantic dimensions."""
+    """Linear projection with dimensions [B, N, C, M]."""
     name: str
     batch: int
     seq_len: int
@@ -73,29 +71,29 @@ class LLMLinearOp:
             'problem': {
                 'shape': {
                     'name': self.name,
-                    'dimensions': ['B', 'S', 'Cin', 'Cout'],
+                    'dimensions': ['B', 'N', 'C', 'M'],
                     'data_spaces': [
                         {
                             'name': 'Inputs1',
                             'projection': [
-                                [['Cout']],
-                                [['Cin']],
+                                [['M']],
+                                [['C']],
                             ],
                         },
                         {
                             'name': 'Inputs2',
                             'projection': [
                                 [['B']],
-                                [['S']],
-                                [['Cin']],
+                                [['N']],
+                                [['C']],
                             ],
                         },
                         {
                             'name': 'Outputs',
                             'projection': [
                                 [['B']],
-                                [['S']],
-                                [['Cout']],
+                                [['N']],
+                                [['M']],
                             ],
                             'read_write': True,
                         },
@@ -103,9 +101,9 @@ class LLMLinearOp:
                 },
                 'instance': {
                     'B': self.batch,
-                    'S': self.seq_len,
-                    'Cin': self.in_features,
-                    'Cout': self.out_features,
+                    'N': self.seq_len,
+                    'C': self.in_features,
+                    'M': self.out_features,
                 },
             },
         }
@@ -113,7 +111,7 @@ class LLMLinearOp:
 
 @dataclass
 class LLMAttentionQKOp:
-    """Attention Q @ K^T operator with LLM-semantic dimensions."""
+    """Attention Q @ K^T with dimensions [B, H, Q, K, D]."""
     name: str
     batch: int
     num_heads: int
@@ -126,14 +124,14 @@ class LLMAttentionQKOp:
             'problem': {
                 'shape': {
                     'name': self.name,
-                    'dimensions': ['B', 'Nh', 'Sq', 'Sk', 'D'],
+                    'dimensions': ['B', 'H', 'Q', 'K', 'D'],
                     'data_spaces': [
                         {
                             'name': 'Inputs1',
                             'projection': [
                                 [['B']],
-                                [['Nh']],
-                                [['Sq']],
+                                [['H']],
+                                [['Q']],
                                 [['D']],
                             ],
                         },
@@ -141,8 +139,8 @@ class LLMAttentionQKOp:
                             'name': 'Inputs2',
                             'projection': [
                                 [['B']],
-                                [['Nh']],
-                                [['Sk']],
+                                [['H']],
+                                [['K']],
                                 [['D']],
                             ],
                         },
@@ -150,9 +148,9 @@ class LLMAttentionQKOp:
                             'name': 'Outputs',
                             'projection': [
                                 [['B']],
-                                [['Nh']],
-                                [['Sq']],
-                                [['Sk']],
+                                [['H']],
+                                [['Q']],
+                                [['K']],
                             ],
                             'read_write': True,
                         },
@@ -160,9 +158,9 @@ class LLMAttentionQKOp:
                 },
                 'instance': {
                     'B': self.batch,
-                    'Nh': self.num_heads,
-                    'Sq': self.q_seq_len,
-                    'Sk': self.kv_seq_len,
+                    'H': self.num_heads,
+                    'Q': self.q_seq_len,
+                    'K': self.kv_seq_len,
                     'D': self.head_dim,
                 },
             },
@@ -171,7 +169,7 @@ class LLMAttentionQKOp:
 
 @dataclass
 class LLMAttentionVOp:
-    """Attention softmax(Scores) @ V operator with LLM-semantic dimensions."""
+    """Attention Scores @ V with dimensions [B, H, Q, K, D]."""
     name: str
     batch: int
     num_heads: int
@@ -184,23 +182,23 @@ class LLMAttentionVOp:
             'problem': {
                 'shape': {
                     'name': self.name,
-                    'dimensions': ['B', 'Nh', 'Sq', 'Sk', 'D'],
+                    'dimensions': ['B', 'H', 'Q', 'K', 'D'],
                     'data_spaces': [
                         {
                             'name': 'Inputs1',
                             'projection': [
                                 [['B']],
-                                [['Nh']],
-                                [['Sq']],
-                                [['Sk']],
+                                [['H']],
+                                [['Q']],
+                                [['K']],
                             ],
                         },
                         {
                             'name': 'Inputs2',
                             'projection': [
                                 [['B']],
-                                [['Nh']],
-                                [['Sk']],
+                                [['H']],
+                                [['K']],
                                 [['D']],
                             ],
                         },
@@ -208,8 +206,8 @@ class LLMAttentionVOp:
                             'name': 'Outputs',
                             'projection': [
                                 [['B']],
-                                [['Nh']],
-                                [['Sq']],
+                                [['H']],
+                                [['Q']],
                                 [['D']],
                             ],
                             'read_write': True,
@@ -218,9 +216,9 @@ class LLMAttentionVOp:
                 },
                 'instance': {
                     'B': self.batch,
-                    'Nh': self.num_heads,
-                    'Sq': self.q_seq_len,
-                    'Sk': self.kv_seq_len,
+                    'H': self.num_heads,
+                    'Q': self.q_seq_len,
+                    'K': self.kv_seq_len,
                     'D': self.head_dim,
                 },
             },

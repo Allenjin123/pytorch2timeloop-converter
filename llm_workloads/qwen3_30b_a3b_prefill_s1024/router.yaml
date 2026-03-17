@@ -1,29 +1,29 @@
 problem:
   instance:
     B: 1
-    Cin: 2048
-    Cout: 128
-    S: 1024
+    C: 2048
+    M: 128
+    N: 1024
   shape:
     data_spaces:
     - name: Inputs1
       projection:
-      - - - Cout
-      - - - Cin
+      - - - M
+      - - - C
     - name: Inputs2
       projection:
       - - - B
-      - - - S
-      - - - Cin
+      - - - N
+      - - - C
     - name: Outputs
       projection:
       - - - B
-      - - - S
-      - - - Cout
+      - - - N
+      - - - M
       read_write: true
     dimensions:
     - B
-    - S
-    - Cin
-    - Cout
+    - N
+    - C
+    - M
     name: router
