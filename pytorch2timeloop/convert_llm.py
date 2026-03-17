@@ -437,13 +437,13 @@ def _generate_moe_mlp_operators(cfg: LLMConfig, layer_idx: int,
     # Router: (B, S, H) -> (B, S, num_experts)
     ops.append(_linear_op(f"{L}_router", B, S, H, n_exp))
 
-    # Expert MLPs: each expert processes tokens_per_expert independent tokens.
-    # B=tokens_per_expert (each token is independent), S=1 (no sequence structure).
+    # Expert MLPs: each expert processes tokens_per_expert tokens.
+    # B=batch_size, S=tokens_per_expert (routed tokens, not a contiguous sequence).
     for exp_idx in range(n_exp):
         E = f"{L}_expert{exp_idx}"
-        ops.append(_linear_op(f"{E}_gate_proj", tokens_per_expert, 1, H, E_I))
-        ops.append(_linear_op(f"{E}_up_proj", tokens_per_expert, 1, H, E_I))
-        ops.append(_linear_op(f"{E}_down_proj", tokens_per_expert, 1, E_I, H))
+        ops.append(_linear_op(f"{E}_gate_proj", B, tokens_per_expert, H, E_I))
+        ops.append(_linear_op(f"{E}_up_proj", B, tokens_per_expert, H, E_I))
+        ops.append(_linear_op(f"{E}_down_proj", B, tokens_per_expert, E_I, H))
 
     return ops
 
@@ -566,9 +566,9 @@ def convert_llm(config_path: str, save_dir: str,
         # Router (unique)
         router_op = _linear_op("router", batch_size, seq_len, H, n_exp)
         # One representative expert: gate_proj (= up_proj) and down_proj
-        # B=tokens_per_expert (independent tokens), S=1 (no sequence structure)
-        expert_gate = _linear_op("expert_gate_proj", tokens_per_expert, 1, H, E_I)
-        expert_down = _linear_op("expert_down_proj", tokens_per_expert, 1, E_I, H)
+        # B=batch_size, S=tokens_per_expert (routed tokens)
+        expert_gate = _linear_op("expert_gate_proj", batch_size, tokens_per_expert, H, E_I)
+        expert_down = _linear_op("expert_down_proj", batch_size, tokens_per_expert, E_I, H)
         unique_mlp = [router_op, expert_gate, expert_down]
     else:
         mlp_ops = _generate_dense_mlp_operators(cfg, 0, batch_size, seq_len)
