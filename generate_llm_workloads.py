@@ -15,13 +15,9 @@ SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 CONFIGS = os.path.join(SCRIPT_DIR, "test", "configs")
 SAVE_DIR = os.path.join(SCRIPT_DIR, "llm_workloads")
 
-# LLaMA 3.1 70B config is in the parent Mozart directory
-LLAMA_70B_CONFIG = os.path.join(os.path.dirname(SCRIPT_DIR),
-                                 "Llama-3.1-70B-Instruct", "config.json")
-
 MODELS = [
     ("llama3.1_8b", os.path.join(CONFIGS, "llama3.1_8b", "config.json")),
-    ("llama3.1_70b", LLAMA_70B_CONFIG),
+    ("llama3.1_70b", os.path.join(CONFIGS, "llama3.1_70b", "config.json")),
     ("qwen3_235b_a22b", os.path.join(CONFIGS, "qwen3_235b_a22b", "config.json")),
     ("qwen3_30b_a3b", os.path.join(CONFIGS, "qwen3_30b_a3b", "config.json")),
 ]
