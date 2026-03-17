@@ -1,0 +1,29 @@
+problem:
+  instance:
+    B: 1
+    Cin: 8192
+    Cout: 128256
+    S: 1
+  shape:
+    data_spaces:
+    - name: Inputs1
+      projection:
+      - - - Cout
+      - - - Cin
+    - name: Inputs2
+      projection:
+      - - - B
+      - - - S
+      - - - Cin
+    - name: Outputs
+      projection:
+      - - - B
+      - - - S
+      - - - Cout
+      read_write: true
+    dimensions:
+    - B
+    - S
+    - Cin
+    - Cout
+    name: lm_head

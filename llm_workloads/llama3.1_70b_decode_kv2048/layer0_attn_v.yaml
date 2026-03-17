@@ -1,0 +1,35 @@
+problem:
+  instance:
+    B: 1
+    D: 128
+    Nh: 64
+    Sk: 2048
+    Sq: 1
+  shape:
+    data_spaces:
+    - name: Inputs1
+      projection:
+      - - - B
+      - - - Nh
+      - - - Sq
+      - - - Sk
+    - name: Inputs2
+      projection:
+      - - - B
+      - - - Nh
+      - - - Sk
+      - - - D
+    - name: Outputs
+      projection:
+      - - - B
+      - - - Nh
+      - - - Sq
+      - - - D
+      read_write: true
+    dimensions:
+    - B
+    - Nh
+    - Sq
+    - Sk
+    - D
+    name: layer0_attn_v
