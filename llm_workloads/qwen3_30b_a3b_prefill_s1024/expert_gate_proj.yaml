@@ -6,11 +6,11 @@ problem:
     S: 64
   shape:
     data_spaces:
-    - name: Weights
+    - name: Inputs1
       projection:
       - - - Cout
       - - - Cin
-    - name: Inputs
+    - name: Inputs2
       projection:
       - - - B
       - - - S

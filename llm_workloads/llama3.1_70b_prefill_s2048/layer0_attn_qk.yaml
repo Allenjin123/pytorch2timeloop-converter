@@ -7,19 +7,19 @@ problem:
     Sq: 2048
   shape:
     data_spaces:
-    - name: Q
+    - name: Inputs1
       projection:
       - - - B
       - - - Nh
       - - - Sq
       - - - D
-    - name: K
+    - name: Inputs2
       projection:
       - - - B
       - - - Nh
       - - - Sk
       - - - D
-    - name: Scores
+    - name: Outputs
       projection:
       - - - B
       - - - Nh

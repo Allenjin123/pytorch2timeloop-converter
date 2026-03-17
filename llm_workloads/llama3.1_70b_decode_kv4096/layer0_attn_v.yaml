@@ -7,19 +7,19 @@ problem:
     Sq: 1
   shape:
     data_spaces:
-    - name: Scores
+    - name: Inputs1
       projection:
       - - - B
       - - - Nh
       - - - Sq
       - - - Sk
-    - name: V
+    - name: Inputs2
       projection:
       - - - B
       - - - Nh
       - - - Sk
       - - - D
-    - name: Context
+    - name: Outputs
       projection:
       - - - B
       - - - Nh

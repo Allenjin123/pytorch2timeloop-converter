@@ -52,10 +52,10 @@ logger = logging.getLogger(__name__)
 #   Sk   = key/value sequence length (= Sq for prefill, kv_cache_len for decode)
 #   D    = head dimension
 #
-# Data space naming:
-#   Linear:  Weights(Cout, Cin), Inputs(B, S, Cin), Outputs(B, S, Cout)
-#   Attn QK: Q(B, Nh, Sq, D), K(B, Nh, Sk, D), Scores(B, Nh, Sq, Sk)
-#   Attn V:  Scores(B, Nh, Sq, Sk), V(B, Nh, Sk, D), Context(B, Nh, Sq, D)
+# Data space naming (consistent across all operators):
+#   Inputs1 = first input operand (Weights / Q / Scores)
+#   Inputs2 = second input operand (Inputs / K / V)
+#   Outputs = output (Outputs / Scores / Context)
 #
 
 
@@ -76,14 +76,14 @@ class LLMLinearOp:
                     'dimensions': ['B', 'S', 'Cin', 'Cout'],
                     'data_spaces': [
                         {
-                            'name': 'Weights',
+                            'name': 'Inputs1',
                             'projection': [
                                 [['Cout']],
                                 [['Cin']],
                             ],
                         },
                         {
-                            'name': 'Inputs',
+                            'name': 'Inputs2',
                             'projection': [
                                 [['B']],
                                 [['S']],
@@ -129,7 +129,7 @@ class LLMAttentionQKOp:
                     'dimensions': ['B', 'Nh', 'Sq', 'Sk', 'D'],
                     'data_spaces': [
                         {
-                            'name': 'Q',
+                            'name': 'Inputs1',
                             'projection': [
                                 [['B']],
                                 [['Nh']],
@@ -138,7 +138,7 @@ class LLMAttentionQKOp:
                             ],
                         },
                         {
-                            'name': 'K',
+                            'name': 'Inputs2',
                             'projection': [
                                 [['B']],
                                 [['Nh']],
@@ -147,7 +147,7 @@ class LLMAttentionQKOp:
                             ],
                         },
                         {
-                            'name': 'Scores',
+                            'name': 'Outputs',
                             'projection': [
                                 [['B']],
                                 [['Nh']],
@@ -187,7 +187,7 @@ class LLMAttentionVOp:
                     'dimensions': ['B', 'Nh', 'Sq', 'Sk', 'D'],
                     'data_spaces': [
                         {
-                            'name': 'Scores',
+                            'name': 'Inputs1',
                             'projection': [
                                 [['B']],
                                 [['Nh']],
@@ -196,7 +196,7 @@ class LLMAttentionVOp:
                             ],
                         },
                         {
-                            'name': 'V',
+                            'name': 'Inputs2',
                             'projection': [
                                 [['B']],
                                 [['Nh']],
@@ -205,7 +205,7 @@ class LLMAttentionVOp:
                             ],
                         },
                         {
-                            'name': 'Context',
+                            'name': 'Outputs',
                             'projection': [
                                 [['B']],
                                 [['Nh']],
