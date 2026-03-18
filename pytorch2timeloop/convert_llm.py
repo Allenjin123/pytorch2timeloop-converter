@@ -225,6 +225,375 @@ class LLMAttentionVOp:
         }
 
 
+# ============================================================
+# FlashAttention (online tiled softmax) operators
+# ============================================================
+#
+# K is tiled into T tiles of size N, i.e. K = T * N.
+# These 12 operators implement the online softmax + tiled attention
+# from FlashAttention / FuseMax proposal.
+#
+#   Dimensions: [B, H, Q, T, N, D]
+#     T = number of KV tiles (kv_seq_len // tile_size)
+#     N = tile size
+#     D = head dimension
+#
+
+@dataclass
+class FlashAttnQKOp:
+    """Tiled Q @ K^T: Q[B,D,H,Q] @ BK[B,D,H,T,N] -> QK[B,H,T,N,Q]."""
+    name: str
+    batch: int
+    num_heads: int
+    q_seq_len: int
+    num_tiles: int
+    tile_size: int
+    head_dim: int
+
+    def to_yaml(self):
+        return {
+            'problem': {
+                'shape': {
+                    'name': self.name,
+                    'dimensions': ['B', 'D', 'H', 'T', 'N', 'Q'],
+                    'data_spaces': [
+                        {'name': 'Q', 'projection': [[['B']], [['D']], [['H']], [['Q']]]},
+                        {'name': 'BK', 'projection': [[['B']], [['D']], [['H']], [['T']], [['N']]]},
+                        {'name': 'QK', 'projection': [[['B']], [['H']], [['T']], [['N']], [['Q']]], 'read_write': True},
+                    ],
+                },
+                'instance': {
+                    'B': self.batch, 'D': self.head_dim, 'H': self.num_heads,
+                    'T': self.num_tiles, 'N': self.tile_size, 'Q': self.q_seq_len,
+                },
+            },
+        }
+
+
+@dataclass
+class FlashAttnLMOp:
+    """Local max: QK[B,H,T,N,Q] -> LM[B,H,T,Q]. Reduce over N."""
+    name: str
+    batch: int
+    num_heads: int
+    q_seq_len: int
+    num_tiles: int
+    tile_size: int
+
+    def to_yaml(self):
+        return {
+            'problem': {
+                'shape': {
+                    'name': self.name,
+                    'dimensions': ['B', 'H', 'T', 'N', 'Q'],
+                    'data_spaces': [
+                        {'name': 'QK', 'projection': [[['B']], [['H']], [['T']], [['N']], [['Q']]]},
+                        {'name': 'LM', 'projection': [[['B']], [['H']], [['T']], [['Q']]], 'read_write': True},
+                    ],
+                },
+                'instance': {
+                    'B': self.batch, 'H': self.num_heads,
+                    'T': self.num_tiles, 'N': self.tile_size, 'Q': self.q_seq_len,
+                },
+            },
+        }
+
+
+@dataclass
+class FlashAttnRMOp:
+    """Running max: max(LM, RM0) -> RM. Elementwise [B,H,T,Q]."""
+    name: str
+    batch: int
+    num_heads: int
+    q_seq_len: int
+    num_tiles: int
+
+    def to_yaml(self):
+        return {
+            'problem': {
+                'shape': {
+                    'name': self.name,
+                    'dimensions': ['B', 'H', 'T', 'Q'],
+                    'data_spaces': [
+                        {'name': 'LM', 'projection': [[['B']], [['H']], [['T']], [['Q']]]},
+                        {'name': 'RM0', 'projection': [[['B']], [['H']], [['T']], [['Q']]]},
+                        {'name': 'RM', 'projection': [[['B']], [['H']], [['T']], [['Q']]], 'read_write': True},
+                    ],
+                },
+                'instance': {
+                    'B': self.batch, 'H': self.num_heads,
+                    'T': self.num_tiles, 'Q': self.q_seq_len,
+                },
+            },
+        }
+
+
+@dataclass
+class FlashAttnPRMOp:
+    """Prev running max rescale: exp(RM0 - RM) -> PRM. Elementwise [B,H,T,Q]."""
+    name: str
+    batch: int
+    num_heads: int
+    q_seq_len: int
+    num_tiles: int
+
+    def to_yaml(self):
+        return {
+            'problem': {
+                'shape': {
+                    'name': self.name,
+                    'dimensions': ['B', 'H', 'T', 'Q'],
+                    'data_spaces': [
+                        {'name': 'RM0', 'projection': [[['B']], [['H']], [['T']], [['Q']]]},
+                        {'name': 'RM', 'projection': [[['B']], [['H']], [['T']], [['Q']]]},
+                        {'name': 'PRM', 'projection': [[['B']], [['H']], [['T']], [['Q']]], 'read_write': True},
+                    ],
+                },
+                'instance': {
+                    'B': self.batch, 'H': self.num_heads,
+                    'T': self.num_tiles, 'Q': self.q_seq_len,
+                },
+            },
+        }
+
+
+@dataclass
+class FlashAttnSLNOp:
+    """Local sub+exp: exp(QK - RM) -> SLN. Dims [B,H,T,N,Q]."""
+    name: str
+    batch: int
+    num_heads: int
+    q_seq_len: int
+    num_tiles: int
+    tile_size: int
+
+    def to_yaml(self):
+        return {
+            'problem': {
+                'shape': {
+                    'name': self.name,
+                    'dimensions': ['B', 'H', 'T', 'N', 'Q'],
+                    'data_spaces': [
+                        {'name': 'QK', 'projection': [[['B']], [['H']], [['T']], [['N']], [['Q']]]},
+                        {'name': 'RM', 'projection': [[['B']], [['H']], [['T']], [['Q']]]},
+                        {'name': 'SLN', 'projection': [[['B']], [['H']], [['T']], [['N']], [['Q']]], 'read_write': True},
+                    ],
+                },
+                'instance': {
+                    'B': self.batch, 'H': self.num_heads,
+                    'T': self.num_tiles, 'N': self.tile_size, 'Q': self.q_seq_len,
+                },
+            },
+        }
+
+
+@dataclass
+class FlashAttnSLDOp:
+    """Local sum: SLN[B,H,T,N,Q] -> SLD[B,H,T,Q]. Reduce over N."""
+    name: str
+    batch: int
+    num_heads: int
+    q_seq_len: int
+    num_tiles: int
+    tile_size: int
+
+    def to_yaml(self):
+        return {
+            'problem': {
+                'shape': {
+                    'name': self.name,
+                    'dimensions': ['B', 'H', 'T', 'N', 'Q'],
+                    'data_spaces': [
+                        {'name': 'SLN', 'projection': [[['B']], [['H']], [['T']], [['N']], [['Q']]]},
+                        {'name': 'SLD', 'projection': [[['B']], [['H']], [['T']], [['Q']]], 'read_write': True},
+                    ],
+                },
+                'instance': {
+                    'B': self.batch, 'H': self.num_heads,
+                    'T': self.num_tiles, 'N': self.tile_size, 'Q': self.q_seq_len,
+                },
+            },
+        }
+
+
+@dataclass
+class FlashAttnSPDOp:
+    """Rescale prev denom: PRM * RD0 -> SPD. Elementwise [B,H,T,Q]."""
+    name: str
+    batch: int
+    num_heads: int
+    q_seq_len: int
+    num_tiles: int
+
+    def to_yaml(self):
+        return {
+            'problem': {
+                'shape': {
+                    'name': self.name,
+                    'dimensions': ['B', 'H', 'T', 'Q'],
+                    'data_spaces': [
+                        {'name': 'PRM', 'projection': [[['B']], [['H']], [['T']], [['Q']]]},
+                        {'name': 'RD0', 'projection': [[['B']], [['H']], [['T']], [['Q']]]},
+                        {'name': 'SPD', 'projection': [[['B']], [['H']], [['T']], [['Q']]], 'read_write': True},
+                    ],
+                },
+                'instance': {
+                    'B': self.batch, 'H': self.num_heads,
+                    'T': self.num_tiles, 'Q': self.q_seq_len,
+                },
+            },
+        }
+
+
+@dataclass
+class FlashAttnRDOp:
+    """Running denom: SPD + SLD -> RD. Elementwise [B,H,T,Q]."""
+    name: str
+    batch: int
+    num_heads: int
+    q_seq_len: int
+    num_tiles: int
+
+    def to_yaml(self):
+        return {
+            'problem': {
+                'shape': {
+                    'name': self.name,
+                    'dimensions': ['B', 'H', 'T', 'Q'],
+                    'data_spaces': [
+                        {'name': 'SPD', 'projection': [[['B']], [['H']], [['T']], [['Q']]]},
+                        {'name': 'SLD', 'projection': [[['B']], [['H']], [['T']], [['Q']]]},
+                        {'name': 'RD', 'projection': [[['B']], [['H']], [['T']], [['Q']]], 'read_write': True},
+                    ],
+                },
+                'instance': {
+                    'B': self.batch, 'H': self.num_heads,
+                    'T': self.num_tiles, 'Q': self.q_seq_len,
+                },
+            },
+        }
+
+
+@dataclass
+class FlashAttnSLNVOp:
+    """Local attn @ V: SLN[B,H,T,N,Q] @ BV[B,D,H,T,N] -> SLNV[B,D,H,Q]."""
+    name: str
+    batch: int
+    num_heads: int
+    q_seq_len: int
+    num_tiles: int
+    tile_size: int
+    head_dim: int
+
+    def to_yaml(self):
+        return {
+            'problem': {
+                'shape': {
+                    'name': self.name,
+                    'dimensions': ['B', 'D', 'H', 'T', 'N', 'Q'],
+                    'data_spaces': [
+                        {'name': 'SLN', 'projection': [[['B']], [['H']], [['T']], [['N']], [['Q']]]},
+                        {'name': 'BV', 'projection': [[['B']], [['D']], [['H']], [['T']], [['N']]]},
+                        {'name': 'SLNV', 'projection': [[['B']], [['D']], [['H']], [['Q']]], 'read_write': True},
+                    ],
+                },
+                'instance': {
+                    'B': self.batch, 'D': self.head_dim, 'H': self.num_heads,
+                    'T': self.num_tiles, 'N': self.tile_size, 'Q': self.q_seq_len,
+                },
+            },
+        }
+
+
+@dataclass
+class FlashAttnSPNVOp:
+    """Rescale prev output: PRM * RNV0 -> SPNV. Elementwise [B,D,H,T,Q]."""
+    name: str
+    batch: int
+    num_heads: int
+    q_seq_len: int
+    num_tiles: int
+    head_dim: int
+
+    def to_yaml(self):
+        return {
+            'problem': {
+                'shape': {
+                    'name': self.name,
+                    'dimensions': ['B', 'D', 'H', 'T', 'Q'],
+                    'data_spaces': [
+                        {'name': 'PRM', 'projection': [[['B']], [['H']], [['T']], [['Q']]]},
+                        {'name': 'RNV0', 'projection': [[['B']], [['D']], [['H']], [['T']], [['Q']]]},
+                        {'name': 'SPNV', 'projection': [[['B']], [['D']], [['H']], [['T']], [['Q']]], 'read_write': True},
+                    ],
+                },
+                'instance': {
+                    'B': self.batch, 'D': self.head_dim, 'H': self.num_heads,
+                    'T': self.num_tiles, 'Q': self.q_seq_len,
+                },
+            },
+        }
+
+
+@dataclass
+class FlashAttnRNVOp:
+    """Running output: SPNV + SLNV -> RNV. Elementwise [B,D,H,T,Q]."""
+    name: str
+    batch: int
+    num_heads: int
+    q_seq_len: int
+    num_tiles: int
+    head_dim: int
+
+    def to_yaml(self):
+        return {
+            'problem': {
+                'shape': {
+                    'name': self.name,
+                    'dimensions': ['B', 'D', 'H', 'T', 'Q'],
+                    'data_spaces': [
+                        {'name': 'SPNV', 'projection': [[['B']], [['D']], [['H']], [['T']], [['Q']]]},
+                        {'name': 'SLNV', 'projection': [[['B']], [['D']], [['H']], [['T']], [['Q']]]},
+                        {'name': 'RNV', 'projection': [[['B']], [['D']], [['H']], [['T']], [['Q']]], 'read_write': True},
+                    ],
+                },
+                'instance': {
+                    'B': self.batch, 'D': self.head_dim, 'H': self.num_heads,
+                    'T': self.num_tiles, 'Q': self.q_seq_len,
+                },
+            },
+        }
+
+
+@dataclass
+class FlashAttnAVOp:
+    """Final divide: RNV / RD -> AV. Dims [B,D,H,Q]."""
+    name: str
+    batch: int
+    num_heads: int
+    q_seq_len: int
+    head_dim: int
+
+    def to_yaml(self):
+        return {
+            'problem': {
+                'shape': {
+                    'name': self.name,
+                    'dimensions': ['B', 'D', 'H', 'Q'],
+                    'data_spaces': [
+                        {'name': 'RNV', 'projection': [[['B']], [['D']], [['H']], [['Q']]]},
+                        {'name': 'RD', 'projection': [[['B']], [['H']], [['Q']]]},
+                        {'name': 'AV', 'projection': [[['B']], [['D']], [['H']], [['Q']]], 'read_write': True},
+                    ],
+                },
+                'instance': {
+                    'B': self.batch, 'D': self.head_dim, 'H': self.num_heads,
+                    'Q': self.q_seq_len,
+                },
+            },
+        }
+
+
 @dataclass
 class LLMSoftmaxMaxOp:
     """Softmax step 1: row-wise max. Dims [B, H, Q, K]. Reduces over K."""
@@ -574,6 +943,54 @@ def _softmax_div_op(name, batch, num_heads, q_seq_len, kv_seq_len):
     )
 
 
+def _generate_flashattn_operators(cfg: LLMConfig, batch_size: int,
+                                   q_seq_len: int, kv_seq_len: int,
+                                   tile_size: int = 256) -> List:
+    """
+    Generate the 12 FlashAttention (online tiled softmax) operators.
+
+    K is split into T tiles of size N: K = T * N.
+    These implement the online softmax recurrence from FlashAttention / FuseMax.
+
+    Args:
+        tile_size: KV tile size (default 256, matching typical FlashAttention).
+    """
+    B = batch_size
+    H = cfg.num_attention_heads
+    D = cfg.head_dim
+    Q = q_seq_len
+    K = kv_seq_len
+    N = tile_size
+    T = (K + N - 1) // N  # ceil division
+
+    return [
+        FlashAttnQKOp(name='flashattn_qk', batch=B, num_heads=H,
+                       q_seq_len=Q, num_tiles=T, tile_size=N, head_dim=D),
+        FlashAttnLMOp(name='flashattn_lm', batch=B, num_heads=H,
+                       q_seq_len=Q, num_tiles=T, tile_size=N),
+        FlashAttnRMOp(name='flashattn_rm', batch=B, num_heads=H,
+                       q_seq_len=Q, num_tiles=T),
+        FlashAttnPRMOp(name='flashattn_prm', batch=B, num_heads=H,
+                        q_seq_len=Q, num_tiles=T),
+        FlashAttnSLNOp(name='flashattn_sln', batch=B, num_heads=H,
+                        q_seq_len=Q, num_tiles=T, tile_size=N),
+        FlashAttnSLDOp(name='flashattn_sld', batch=B, num_heads=H,
+                        q_seq_len=Q, num_tiles=T, tile_size=N),
+        FlashAttnSPDOp(name='flashattn_spd', batch=B, num_heads=H,
+                        q_seq_len=Q, num_tiles=T),
+        FlashAttnRDOp(name='flashattn_rd', batch=B, num_heads=H,
+                       q_seq_len=Q, num_tiles=T),
+        FlashAttnSLNVOp(name='flashattn_slnv', batch=B, num_heads=H,
+                         q_seq_len=Q, num_tiles=T, tile_size=N, head_dim=D),
+        FlashAttnSPNVOp(name='flashattn_spnv', batch=B, num_heads=H,
+                         q_seq_len=Q, num_tiles=T, head_dim=D),
+        FlashAttnRNVOp(name='flashattn_rnv', batch=B, num_heads=H,
+                        q_seq_len=Q, num_tiles=T, head_dim=D),
+        FlashAttnAVOp(name='flashattn_av', batch=B, num_heads=H,
+                       q_seq_len=Q, head_dim=D),
+    ]
+
+
 def _generate_attention_operators(cfg: LLMConfig, layer_idx: int,
                                    batch_size: int, seq_len: int,
                                    kv_cache_len: Optional[int] = None) -> List:
@@ -839,7 +1256,20 @@ def convert_llm(config_path: str, save_dir: str,
     _write_network_description(cfg, outdir, phase, seq_len, kv_cache_len,
                                batch_size, unique_ops)
 
+    # Generate FlashAttention (tiled online softmax) operators in subfolder
+    Sq = seq_len
+    Sk = kv_cache_len if kv_cache_len is not None else seq_len
+    flashattn_ops = _generate_flashattn_operators(cfg, batch_size, Sq, Sk)
+    flashattn_dir = os.path.join(outdir, "flashattn")
+    os.makedirs(flashattn_dir, exist_ok=True)
+    for op in flashattn_ops:
+        fname = f"{op.name}.yaml"
+        fpath = os.path.join(flashattn_dir, fname)
+        with open(fpath, 'w') as f:
+            yaml.dump(op.to_yaml(), f, default_flow_style=False)
+
     print(f"Generated {len(unique_ops)} unique YAML files in {outdir}/")
+    print(f"  + {len(flashattn_ops)} FlashAttention ops in {flashattn_dir}/")
     print(f"  Phase: {phase}")
     if phase == 'prefill':
         print(f"  seq_len={seq_len}, batch_size={batch_size}")
