@@ -1268,6 +1268,21 @@ def convert_llm(config_path: str, save_dir: str,
         with open(fpath, 'w') as f:
             yaml.dump(op.to_yaml(), f, default_flow_style=False)
 
+    # Write dimensions summary for FlashAttention
+    M = kv_cache_len if kv_cache_len is not None else seq_len
+    Q_len = seq_len if phase == 'prefill' else 1
+    dims = {
+        'dimensions': {
+            'B': {'value': batch_size, 'description': 'Batch size'},
+            'D': {'value': cfg.head_dim, 'description': 'Head dimension (Q/K/V)'},
+            'H': {'value': cfg.num_attention_heads, 'description': 'Number of attention heads'},
+            'M': {'value': M, 'description': 'KV sequence length'},
+            'Q': {'value': Q_len, 'description': 'Query sequence length'},
+        },
+    }
+    with open(os.path.join(flashattn_dir, 'dimensions.yaml'), 'w') as f:
+        yaml.dump(dims, f, default_flow_style=False, sort_keys=False)
+
     print(f"Generated {len(unique_ops)} unique YAML files in {outdir}/")
     print(f"  + {len(flashattn_ops)} FlashAttention ops in {flashattn_dir}/")
     print(f"  Phase: {phase}")
