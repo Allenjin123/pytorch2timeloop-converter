@@ -226,6 +226,208 @@ class LLMAttentionVOp:
 
 
 @dataclass
+class LLMSoftmaxMaxOp:
+    """Softmax step 1: row-wise max. Dims [B, H, Q, K]. Reduces over K."""
+    name: str
+    batch: int
+    num_heads: int
+    q_seq_len: int
+    kv_seq_len: int
+
+    def to_yaml(self):
+        return {
+            'problem': {
+                'shape': {
+                    'name': self.name,
+                    'dimensions': ['B', 'H', 'Q', 'K'],
+                    'data_spaces': [
+                        {
+                            'name': 'Inputs1',
+                            'projection': [
+                                [['B']],
+                                [['H']],
+                                [['Q']],
+                                [['K']],
+                            ],
+                        },
+                        {
+                            'name': 'Outputs',
+                            'projection': [
+                                [['B']],
+                                [['H']],
+                                [['Q']],
+                            ],
+                            'read_write': True,
+                        },
+                    ],
+                },
+                'instance': {
+                    'B': self.batch,
+                    'H': self.num_heads,
+                    'Q': self.q_seq_len,
+                    'K': self.kv_seq_len,
+                },
+            },
+        }
+
+
+@dataclass
+class LLMSoftmaxSubExpOp:
+    """Softmax step 2: subtract max and exponentiate. Dims [B, H, Q, K]."""
+    name: str
+    batch: int
+    num_heads: int
+    q_seq_len: int
+    kv_seq_len: int
+
+    def to_yaml(self):
+        return {
+            'problem': {
+                'shape': {
+                    'name': self.name,
+                    'dimensions': ['B', 'H', 'Q', 'K'],
+                    'data_spaces': [
+                        {
+                            'name': 'Inputs1',
+                            'projection': [
+                                [['B']],
+                                [['H']],
+                                [['Q']],
+                                [['K']],
+                            ],
+                        },
+                        {
+                            'name': 'Inputs2',
+                            'projection': [
+                                [['B']],
+                                [['H']],
+                                [['Q']],
+                            ],
+                        },
+                        {
+                            'name': 'Outputs',
+                            'projection': [
+                                [['B']],
+                                [['H']],
+                                [['Q']],
+                                [['K']],
+                            ],
+                            'read_write': True,
+                        },
+                    ],
+                },
+                'instance': {
+                    'B': self.batch,
+                    'H': self.num_heads,
+                    'Q': self.q_seq_len,
+                    'K': self.kv_seq_len,
+                },
+            },
+        }
+
+
+@dataclass
+class LLMSoftmaxSumOp:
+    """Softmax step 3: row-wise sum of exp values. Dims [B, H, Q, K]. Reduces over K."""
+    name: str
+    batch: int
+    num_heads: int
+    q_seq_len: int
+    kv_seq_len: int
+
+    def to_yaml(self):
+        return {
+            'problem': {
+                'shape': {
+                    'name': self.name,
+                    'dimensions': ['B', 'H', 'Q', 'K'],
+                    'data_spaces': [
+                        {
+                            'name': 'Inputs1',
+                            'projection': [
+                                [['B']],
+                                [['H']],
+                                [['Q']],
+                                [['K']],
+                            ],
+                        },
+                        {
+                            'name': 'Outputs',
+                            'projection': [
+                                [['B']],
+                                [['H']],
+                                [['Q']],
+                            ],
+                            'read_write': True,
+                        },
+                    ],
+                },
+                'instance': {
+                    'B': self.batch,
+                    'H': self.num_heads,
+                    'Q': self.q_seq_len,
+                    'K': self.kv_seq_len,
+                },
+            },
+        }
+
+
+@dataclass
+class LLMSoftmaxDivOp:
+    """Softmax step 4: divide by sum. Dims [B, H, Q, K]."""
+    name: str
+    batch: int
+    num_heads: int
+    q_seq_len: int
+    kv_seq_len: int
+
+    def to_yaml(self):
+        return {
+            'problem': {
+                'shape': {
+                    'name': self.name,
+                    'dimensions': ['B', 'H', 'Q', 'K'],
+                    'data_spaces': [
+                        {
+                            'name': 'Inputs1',
+                            'projection': [
+                                [['B']],
+                                [['H']],
+                                [['Q']],
+                                [['K']],
+                            ],
+                        },
+                        {
+                            'name': 'Inputs2',
+                            'projection': [
+                                [['B']],
+                                [['H']],
+                                [['Q']],
+                            ],
+                        },
+                        {
+                            'name': 'Outputs',
+                            'projection': [
+                                [['B']],
+                                [['H']],
+                                [['Q']],
+                                [['K']],
+                            ],
+                            'read_write': True,
+                        },
+                    ],
+                },
+                'instance': {
+                    'B': self.batch,
+                    'H': self.num_heads,
+                    'Q': self.q_seq_len,
+                    'K': self.kv_seq_len,
+                },
+            },
+        }
+
+
+@dataclass
 class LLMConfig:
     """Parsed LLM configuration with all fields needed for workload generation."""
     model_name: str
@@ -340,6 +542,38 @@ def _attn_v_op(name, batch, num_heads, q_seq_len, kv_seq_len, head_dim):
     )
 
 
+def _softmax_max_op(name, batch, num_heads, q_seq_len, kv_seq_len):
+    """Create an LLMSoftmaxMaxOp (row-wise max)."""
+    return LLMSoftmaxMaxOp(
+        name=name, batch=batch, num_heads=num_heads,
+        q_seq_len=q_seq_len, kv_seq_len=kv_seq_len,
+    )
+
+
+def _softmax_sub_exp_op(name, batch, num_heads, q_seq_len, kv_seq_len):
+    """Create an LLMSoftmaxSubExpOp (subtract max + exp)."""
+    return LLMSoftmaxSubExpOp(
+        name=name, batch=batch, num_heads=num_heads,
+        q_seq_len=q_seq_len, kv_seq_len=kv_seq_len,
+    )
+
+
+def _softmax_sum_op(name, batch, num_heads, q_seq_len, kv_seq_len):
+    """Create an LLMSoftmaxSumOp (row-wise sum)."""
+    return LLMSoftmaxSumOp(
+        name=name, batch=batch, num_heads=num_heads,
+        q_seq_len=q_seq_len, kv_seq_len=kv_seq_len,
+    )
+
+
+def _softmax_div_op(name, batch, num_heads, q_seq_len, kv_seq_len):
+    """Create an LLMSoftmaxDivOp (divide by sum)."""
+    return LLMSoftmaxDivOp(
+        name=name, batch=batch, num_heads=num_heads,
+        q_seq_len=q_seq_len, kv_seq_len=kv_seq_len,
+    )
+
+
 def _generate_attention_operators(cfg: LLMConfig, layer_idx: int,
                                    batch_size: int, seq_len: int,
                                    kv_cache_len: Optional[int] = None) -> List:
@@ -378,7 +612,14 @@ def _generate_attention_operators(cfg: LLMConfig, layer_idx: int,
     # KV heads are broadcast to n_h via GQA repeat; KV reuse is a mapping concern.
     ops.append(_attn_qk_op(f"{L}_attn_qk", B, n_h, Sq, Sk, d))
 
-    # Attention context: Scores(B, Nh, Sq, Sk) @ V(B, Nh, Sk, D) -> Context(B, Nh, Sq, D)
+    # Softmax: 4-step decomposition (max, sub+exp, sum, div)
+    # Scores(B, Nh, Sq, Sk) -> Attention(B, Nh, Sq, Sk)
+    ops.append(_softmax_max_op(f"{L}_softmax_max", B, n_h, Sq, Sk))
+    ops.append(_softmax_sub_exp_op(f"{L}_softmax_sub_exp", B, n_h, Sq, Sk))
+    ops.append(_softmax_sum_op(f"{L}_softmax_sum", B, n_h, Sq, Sk))
+    ops.append(_softmax_div_op(f"{L}_softmax_div", B, n_h, Sq, Sk))
+
+    # Attention context: A(B, Nh, Sq, Sk) @ V(B, Nh, Sk, D) -> Context(B, Nh, Sq, D)
     ops.append(_attn_v_op(f"{L}_attn_v", B, n_h, Sq, Sk, d))
 
     # O projection: (B, S, n_h*d) -> (B, S, H)
@@ -452,8 +693,8 @@ def generate_layer_operators(cfg: LLMConfig, layer_idx: int,
     """
     Generate Timeloop operator descriptions for one decoder layer.
 
-    Dense model: 9 ops (6 attention + 3 MLP)
-    MoE model: 6 attention + 1 router + 3*num_experts expert MLP ops
+    Dense model: 13 ops (10 attention [6 + 4 softmax] + 3 MLP)
+    MoE model: 10 attention + 1 router + 3*num_experts expert MLP ops
 
     Args:
         kv_cache_len: If set, generate decode-phase attention (Q=1 token,
@@ -631,7 +872,7 @@ def _write_network_description(cfg, outdir, phase, seq_len, kv_cache_len,
         tokens_per_expert = max(
             (batch_size * seq_len * top_k) // n_exp, 1
         )
-        ops_per_layer = 6 + 1 + 3 * n_exp  # attn + router + expert MLPs
+        ops_per_layer = 10 + 1 + 3 * n_exp  # attn(6+4 softmax) + router + expert MLPs
         layer_sequence = [
             {'yaml': 'q_proj.yaml', 'count': 1,
              'description': f'Query projection: (B*S, {cfg.hidden_size}) @ ({cfg.hidden_size}, {cfg.num_attention_heads * cfg.head_dim})'},
@@ -641,8 +882,16 @@ def _write_network_description(cfg, outdir, phase, seq_len, kv_cache_len,
              'description': 'Value projection: same dimensions as k_proj (GQA)'},
             {'yaml': 'attn_qk.yaml', 'count': 1,
              'description': f'Attention scores: Q @ K^T, batched over {cfg.num_attention_heads} heads'},
+            {'yaml': 'softmax_max.yaml', 'count': 1,
+             'description': 'Softmax step 1: row-wise max over K'},
+            {'yaml': 'softmax_sub_exp.yaml', 'count': 1,
+             'description': 'Softmax step 2: subtract max and exponentiate'},
+            {'yaml': 'softmax_sum.yaml', 'count': 1,
+             'description': 'Softmax step 3: row-wise sum of exp values'},
+            {'yaml': 'softmax_div.yaml', 'count': 1,
+             'description': 'Softmax step 4: divide by sum'},
             {'yaml': 'attn_v.yaml', 'count': 1,
-             'description': 'Attention context: softmax(scores) @ V'},
+             'description': 'Attention context: A @ V'},
             {'yaml': 'o_proj.yaml', 'count': 1,
              'description': f'Output projection: ({cfg.num_attention_heads * cfg.head_dim}) -> ({cfg.hidden_size})'},
             {'yaml': 'router.yaml', 'count': 1,
@@ -655,7 +904,7 @@ def _write_network_description(cfg, outdir, phase, seq_len, kv_cache_len,
              'description': f'Expert down projection: ({cfg.moe_intermediate_size}) -> ({cfg.hidden_size}), {n_exp} experts'},
         ]
     else:
-        ops_per_layer = 9
+        ops_per_layer = 13
         layer_sequence = [
             {'yaml': 'layer0_q_proj.yaml', 'count': 1,
              'description': f'Query projection: (B*S, {cfg.hidden_size}) @ ({cfg.hidden_size}, {cfg.num_attention_heads * cfg.head_dim})'},
@@ -665,8 +914,16 @@ def _write_network_description(cfg, outdir, phase, seq_len, kv_cache_len,
              'description': 'Value projection: same dimensions as k_proj (GQA)'},
             {'yaml': 'layer0_attn_qk.yaml', 'count': 1,
              'description': f'Attention scores: Q @ K^T, batched over {cfg.num_attention_heads} heads'},
+            {'yaml': 'layer0_softmax_max.yaml', 'count': 1,
+             'description': 'Softmax step 1: row-wise max over K'},
+            {'yaml': 'layer0_softmax_sub_exp.yaml', 'count': 1,
+             'description': 'Softmax step 2: subtract max and exponentiate'},
+            {'yaml': 'layer0_softmax_sum.yaml', 'count': 1,
+             'description': 'Softmax step 3: row-wise sum of exp values'},
+            {'yaml': 'layer0_softmax_div.yaml', 'count': 1,
+             'description': 'Softmax step 4: divide by sum'},
             {'yaml': 'layer0_attn_v.yaml', 'count': 1,
-             'description': 'Attention context: softmax(scores) @ V'},
+             'description': 'Attention context: A @ V'},
             {'yaml': 'layer0_o_proj.yaml', 'count': 1,
              'description': f'Output projection: ({cfg.num_attention_heads * cfg.head_dim}) -> ({cfg.hidden_size})'},
             {'yaml': 'layer0_gate_proj.yaml', 'count': 1,

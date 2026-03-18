@@ -20,13 +20,17 @@ structure:
   - layer0_q_proj
   - layer0_k_proj
   - layer0_attn_qk
+  - layer0_softmax_max
+  - layer0_softmax_sub_exp
+  - layer0_softmax_sum
+  - layer0_softmax_div
   - layer0_attn_v
   - layer0_o_proj
   - layer0_gate_proj
   - layer0_down_proj
   - lm_head
-  total_operators_in_model: 289
-  operators_per_layer: 9
+  total_operators_in_model: 417
+  operators_per_layer: 13
   num_layers: 32
   layer_operator_sequence:
   - yaml: layer0_q_proj.yaml
@@ -42,9 +46,21 @@ structure:
   - yaml: layer0_attn_qk.yaml
     count: 1
     description: 'Attention scores: Q @ K^T, batched over 32 heads'
+  - yaml: layer0_softmax_max.yaml
+    count: 1
+    description: 'Softmax step 1: row-wise max over K'
+  - yaml: layer0_softmax_sub_exp.yaml
+    count: 1
+    description: 'Softmax step 2: subtract max and exponentiate'
+  - yaml: layer0_softmax_sum.yaml
+    count: 1
+    description: 'Softmax step 3: row-wise sum of exp values'
+  - yaml: layer0_softmax_div.yaml
+    count: 1
+    description: 'Softmax step 4: divide by sum'
   - yaml: layer0_attn_v.yaml
     count: 1
-    description: 'Attention context: softmax(scores) @ V'
+    description: 'Attention context: A @ V'
   - yaml: layer0_o_proj.yaml
     count: 1
     description: 'Output projection: (4096) -> (4096)'
