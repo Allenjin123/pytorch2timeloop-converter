@@ -1,0 +1,37 @@
+problem:
+  instance:
+    B: 1
+    H: 32
+    N: 256
+    Q: 2048
+    T: 8
+  shape:
+    data_spaces:
+    - name: QK
+      projection:
+      - - - B
+      - - - H
+      - - - T
+      - - - N
+      - - - Q
+    - name: RM
+      projection:
+      - - - B
+      - - - H
+      - - - T
+      - - - Q
+    - name: SLN
+      projection:
+      - - - B
+      - - - H
+      - - - T
+      - - - N
+      - - - Q
+      read_write: true
+    dimensions:
+    - B
+    - H
+    - T
+    - N
+    - Q
+    name: flashattn_sln

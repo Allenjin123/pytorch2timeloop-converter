@@ -1,0 +1,39 @@
+problem:
+  instance:
+    B: 1
+    D: 128
+    H: 32
+    N: 256
+    Q: 1
+    T: 4
+  shape:
+    data_spaces:
+    - name: SLN
+      projection:
+      - - - B
+      - - - H
+      - - - T
+      - - - N
+      - - - Q
+    - name: BV
+      projection:
+      - - - B
+      - - - D
+      - - - H
+      - - - T
+      - - - N
+    - name: SLNV
+      projection:
+      - - - B
+      - - - D
+      - - - H
+      - - - Q
+      read_write: true
+    dimensions:
+    - B
+    - D
+    - H
+    - T
+    - N
+    - Q
+    name: flashattn_slnv

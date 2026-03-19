@@ -1,0 +1,33 @@
+problem:
+  instance:
+    B: 1
+    H: 64
+    Q: 1
+    T: 4
+  shape:
+    data_spaces:
+    - name: RM0
+      projection:
+      - - - B
+      - - - H
+      - - - T
+      - - - Q
+    - name: RM
+      projection:
+      - - - B
+      - - - H
+      - - - T
+      - - - Q
+    - name: PRM
+      projection:
+      - - - B
+      - - - H
+      - - - T
+      - - - Q
+      read_write: true
+    dimensions:
+    - B
+    - H
+    - T
+    - Q
+    name: flashattn_prm
