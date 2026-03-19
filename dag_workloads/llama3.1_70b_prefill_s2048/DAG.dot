@@ -1,0 +1,67 @@
+digraph G {
+  label="llama3.1_70b_prefill_s2048";
+  labelloc="t";
+  fontsize=16;
+  fontname="Helvetica";
+  rankdir=TB;
+  nodesep=0.4;
+  ranksep=0.6;
+  node [fontname="Helvetica", fontsize=10, style="filled,rounded", penwidth=1.5];
+  edge [fontname="Helvetica", fontsize=8, color="#555555"];
+
+  { rank=same; "layer0_k_proj" "layer0_q_proj" "layer0_v_proj" }
+  { rank=same; "layer0_gate_proj" "layer0_up_proj" }
+
+  "layer0_input" [label="input", shape=ellipse, fillcolor="#E8E8E8", style="filled"];
+  "layer0_k_proj" [label="k_proj\n8192x1024", shape=box, fillcolor="#4A90D9", fontcolor="white"];
+  "layer0_q_proj" [label="q_proj\n8192x8192", shape=box, fillcolor="#4A90D9", fontcolor="white"];
+  "layer0_attn_qk" [label="attn_qk\n2048x2048", shape=diamond, fillcolor="#E8963E", fontcolor="white"];
+  "layer0_v_proj" [label="v_proj\n8192x1024", shape=box, fillcolor="#4A90D9", fontcolor="white"];
+  "layer0_attn_v" [label="attn_v\n2048x2048", shape=diamond, fillcolor="#D4722C", fontcolor="white"];
+  "layer0_o_proj" [label="o_proj\n8192x8192", shape=box, fillcolor="#4A90D9", fontcolor="white"];
+  "layer0_attn_residual_add" [label="+", shape=circle, fillcolor="#E85454", width=0.3, height=0.3, fixedsize=true, fontsize=14];
+  "layer0_gate_proj" [label="gate_proj\n8192x28672", shape=box, fillcolor="#4A90D9", fontcolor="white"];
+  "layer0_up_proj" [label="up_proj\n8192x28672", shape=box, fillcolor="#4A90D9", fontcolor="white"];
+  "layer0_down_proj" [label="down_proj\n28672x8192", shape=box, fillcolor="#4A90D9", fontcolor="white"];
+  "layer0_mlp_residual_add" [label="+", shape=circle, fillcolor="#E85454", width=0.3, height=0.3, fixedsize=true, fontsize=14];
+  "lm_head" [label="lm_head\n8192x128256", shape=box, fillcolor="#4A90D9", fontcolor="white"];
+
+  "layer0_input" -> "layer0_q_proj" [label="[1x2048x8192]", style=solid, color="#555555", penwidth=1.0];
+  "layer0_input" -> "layer0_k_proj" [label="[1x2048x8192]", style=solid, color="#555555", penwidth=1.0];
+  "layer0_input" -> "layer0_v_proj" [label="[1x2048x8192]", style=solid, color="#555555", penwidth=1.0];
+  "layer0_q_proj" -> "layer0_attn_qk" [label="query\n[1x64x2048x128]", style=solid, color="#555555", penwidth=1.0];
+  "layer0_k_proj" -> "layer0_attn_qk" [label="key\n[1x64x2048x128]", style=solid, color="#555555", penwidth=1.0];
+  "layer0_attn_qk" -> "layer0_attn_v" [label="scores\n[1x64x2048x2048]", style=solid, color="#555555", penwidth=1.0];
+  "layer0_v_proj" -> "layer0_attn_v" [label="value\n[1x64x2048x128]", style=solid, color="#555555", penwidth=1.0];
+  "layer0_attn_v" -> "layer0_o_proj" [label="attn_output\n[1x2048x8192]", style=solid, color="#555555", penwidth=1.0];
+  "layer0_o_proj" -> "layer0_attn_residual_add" [label="o_proj_output\n[1x2048x8192]", style=solid, color="#555555", penwidth=1.0];
+  "layer0_input" -> "layer0_attn_residual_add" [label="residual\n[1x2048x8192]", style=dashed, color="#E85454", penwidth=2.0];
+  "layer0_attn_residual_add" -> "layer0_gate_proj" [label="post_attn\n[1x2048x8192]", style=solid, color="#555555", penwidth=1.0];
+  "layer0_attn_residual_add" -> "layer0_up_proj" [label="post_attn\n[1x2048x8192]", style=solid, color="#555555", penwidth=1.0];
+  "layer0_gate_proj" -> "layer0_down_proj" [label="gate_output\n[1x2048x28672]", style=solid, color="#555555", penwidth=1.0];
+  "layer0_up_proj" -> "layer0_down_proj" [label="up_output\n[1x2048x28672]", style=solid, color="#555555", penwidth=1.0];
+  "layer0_down_proj" -> "layer0_mlp_residual_add" [label="down_proj_ou...\n[1x2048x8192]", style=solid, color="#555555", penwidth=1.0];
+  "layer0_attn_residual_add" -> "layer0_mlp_residual_add" [label="residual\n[1x2048x8192]", style=dashed, color="#E85454", penwidth=2.0];
+  "layer0_mlp_residual_add" -> "lm_head" [label="final_hidden\n[1x2048x8192]", style=solid, color="#555555", penwidth=1.0];
+
+  // Repeat block: decoder_layer x80
+  "repeat_note" [label="Repeated x80 layers", shape=note, fillcolor="#FFFFCC", style="filled", fontsize=11, fontcolor="#666666"];
+  "layer0_mlp_residual_add" -> "repeat_note" [style=dotted, color="#999999", arrowhead=none];
+
+  subgraph cluster_legend {
+    label="Legend";
+    fontsize=11;
+    style="rounded";
+    color="#CCCCCC";
+    bgcolor="#F8F8F8";
+    "leg_linear" [label="linear", shape=box, fillcolor="#4A90D9", fontcolor="white", fontsize=9, width=1.2, height=0.25];
+    "leg_attn_qk" [label="attn qk", shape=diamond, fillcolor="#E8963E", fontcolor="white", fontsize=9, width=1.2, height=0.25];
+    "leg_attn_v" [label="attn v", shape=diamond, fillcolor="#D4722C", fontcolor="white", fontsize=9, width=1.2, height=0.25];
+    "leg_residual_add" [label="residual add", shape=circle, fillcolor="#E85454", fontcolor="white", fontsize=9, width=1.2, height=0.25];
+    "leg_linear" -> "leg_attn_qk" -> "leg_attn_v" -> "leg_residual_add" [style=invis];
+    "leg_skip_src" [label="", shape=point, width=0.1];
+    "leg_skip_dst" [label="skip conn.", shape=plaintext, fontsize=9];
+    "leg_skip_src" -> "leg_skip_dst" [style=dashed, color="#E85454", penwidth=2.0];
+    "leg_residual_add" -> "leg_skip_src" [style=invis];
+  }
+}

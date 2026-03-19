@@ -1,0 +1,1661 @@
+dag:
+  model_name: mobilenet_v3_small
+  num_nodes: 69
+  num_edges: 83
+  topological_order:
+  - stem_conv
+  - block0_depthwise
+  - block0_se_fc1
+  - block0_se_fc2
+  - block0_se_mul
+  - block0_project
+  - block1_expand
+  - block1_depthwise
+  - block1_project
+  - block2_expand
+  - block2_depthwise
+  - block2_project
+  - block2_residual_add
+  - block3_expand
+  - block3_depthwise
+  - block3_se_fc1
+  - block3_se_fc2
+  - block3_se_mul
+  - block3_project
+  - block4_expand
+  - block4_depthwise
+  - block4_se_fc1
+  - block4_se_fc2
+  - block4_se_mul
+  - block4_project
+  - block4_residual_add
+  - block5_expand
+  - block5_depthwise
+  - block5_se_fc1
+  - block5_se_fc2
+  - block5_se_mul
+  - block5_project
+  - block5_residual_add
+  - block6_expand
+  - block6_depthwise
+  - block6_se_fc1
+  - block6_se_fc2
+  - block6_se_mul
+  - block6_project
+  - block7_expand
+  - block7_depthwise
+  - block7_se_fc1
+  - block7_se_fc2
+  - block7_se_mul
+  - block7_project
+  - block7_residual_add
+  - block8_expand
+  - block8_depthwise
+  - block8_se_fc1
+  - block8_se_fc2
+  - block8_se_mul
+  - block8_project
+  - block9_expand
+  - block9_depthwise
+  - block9_se_fc1
+  - block9_se_fc2
+  - block9_se_mul
+  - block9_project
+  - block9_residual_add
+  - block10_expand
+  - block10_depthwise
+  - block10_se_fc1
+  - block10_se_fc2
+  - block10_se_mul
+  - block10_project
+  - block10_residual_add
+  - final_conv
+  - classifier
+  - head
+  parallel_levels:
+  - level: 0
+    nodes:
+    - stem_conv
+  - level: 1
+    nodes:
+    - block0_depthwise
+  - level: 2
+    nodes:
+    - block0_se_fc1
+  - level: 3
+    nodes:
+    - block0_se_fc2
+  - level: 4
+    nodes:
+    - block0_se_mul
+  - level: 5
+    nodes:
+    - block0_project
+  - level: 6
+    nodes:
+    - block1_expand
+  - level: 7
+    nodes:
+    - block1_depthwise
+  - level: 8
+    nodes:
+    - block1_project
+  - level: 9
+    nodes:
+    - block2_expand
+  - level: 10
+    nodes:
+    - block2_depthwise
+  - level: 11
+    nodes:
+    - block2_project
+  - level: 12
+    nodes:
+    - block2_residual_add
+  - level: 13
+    nodes:
+    - block3_expand
+  - level: 14
+    nodes:
+    - block3_depthwise
+  - level: 15
+    nodes:
+    - block3_se_fc1
+  - level: 16
+    nodes:
+    - block3_se_fc2
+  - level: 17
+    nodes:
+    - block3_se_mul
+  - level: 18
+    nodes:
+    - block3_project
+  - level: 19
+    nodes:
+    - block4_expand
+  - level: 20
+    nodes:
+    - block4_depthwise
+  - level: 21
+    nodes:
+    - block4_se_fc1
+  - level: 22
+    nodes:
+    - block4_se_fc2
+  - level: 23
+    nodes:
+    - block4_se_mul
+  - level: 24
+    nodes:
+    - block4_project
+  - level: 25
+    nodes:
+    - block4_residual_add
+  - level: 26
+    nodes:
+    - block5_expand
+  - level: 27
+    nodes:
+    - block5_depthwise
+  - level: 28
+    nodes:
+    - block5_se_fc1
+  - level: 29
+    nodes:
+    - block5_se_fc2
+  - level: 30
+    nodes:
+    - block5_se_mul
+  - level: 31
+    nodes:
+    - block5_project
+  - level: 32
+    nodes:
+    - block5_residual_add
+  - level: 33
+    nodes:
+    - block6_expand
+  - level: 34
+    nodes:
+    - block6_depthwise
+  - level: 35
+    nodes:
+    - block6_se_fc1
+  - level: 36
+    nodes:
+    - block6_se_fc2
+  - level: 37
+    nodes:
+    - block6_se_mul
+  - level: 38
+    nodes:
+    - block6_project
+  - level: 39
+    nodes:
+    - block7_expand
+  - level: 40
+    nodes:
+    - block7_depthwise
+  - level: 41
+    nodes:
+    - block7_se_fc1
+  - level: 42
+    nodes:
+    - block7_se_fc2
+  - level: 43
+    nodes:
+    - block7_se_mul
+  - level: 44
+    nodes:
+    - block7_project
+  - level: 45
+    nodes:
+    - block7_residual_add
+  - level: 46
+    nodes:
+    - block8_expand
+  - level: 47
+    nodes:
+    - block8_depthwise
+  - level: 48
+    nodes:
+    - block8_se_fc1
+  - level: 49
+    nodes:
+    - block8_se_fc2
+  - level: 50
+    nodes:
+    - block8_se_mul
+  - level: 51
+    nodes:
+    - block8_project
+  - level: 52
+    nodes:
+    - block9_expand
+  - level: 53
+    nodes:
+    - block9_depthwise
+  - level: 54
+    nodes:
+    - block9_se_fc1
+  - level: 55
+    nodes:
+    - block9_se_fc2
+  - level: 56
+    nodes:
+    - block9_se_mul
+  - level: 57
+    nodes:
+    - block9_project
+  - level: 58
+    nodes:
+    - block9_residual_add
+  - level: 59
+    nodes:
+    - block10_expand
+  - level: 60
+    nodes:
+    - block10_depthwise
+  - level: 61
+    nodes:
+    - block10_se_fc1
+  - level: 62
+    nodes:
+    - block10_se_fc2
+  - level: 63
+    nodes:
+    - block10_se_mul
+  - level: 64
+    nodes:
+    - block10_project
+  - level: 65
+    nodes:
+    - block10_residual_add
+  - level: 66
+    nodes:
+    - final_conv
+  - level: 67
+    nodes:
+    - classifier
+  - level: 68
+    nodes:
+    - head
+  nodes:
+  - id: stem_conv
+    op_type: conv2d
+    yaml_file: layer1_features_0_0.yaml
+    tensor_dims:
+      N: 1
+      C: 3
+      M: 16
+      R: 3
+      S: 3
+      P: 112
+      Q: 112
+  - id: block0_depthwise
+    op_type: depthwise_conv2d
+    yaml_file: layer2_features_1_block_1_0.yaml
+    tensor_dims:
+      N: 1
+      C: 16
+      M: 16
+      G: 16
+      R: 3
+      S: 3
+      P: 56
+      Q: 56
+  - id: block0_se_fc1
+    op_type: pointwise_conv2d
+    yaml_file: layer3_features_1_block_2_fc1.yaml
+    tensor_dims:
+      N: 1
+      C: 16
+      M: 4
+      R: 1
+      S: 1
+      P: 1
+      Q: 1
+  - id: block0_se_fc2
+    op_type: pointwise_conv2d
+    yaml_file: layer4_features_1_block_2_fc2.yaml
+    tensor_dims:
+      N: 1
+      C: 4
+      M: 16
+      R: 1
+      S: 1
+      P: 1
+      Q: 1
+  - id: block0_se_mul
+    op_type: elementwise_mul
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 16
+      H: 56
+      W: 56
+  - id: block0_project
+    op_type: pointwise_conv2d
+    yaml_file: layer5_features_1_block_3_0.yaml
+    tensor_dims:
+      N: 1
+      C: 16
+      M: 16
+      R: 1
+      S: 1
+      P: 56
+      Q: 56
+  - id: block1_expand
+    op_type: pointwise_conv2d
+    yaml_file: layer6_features_2_block_0_0.yaml
+    tensor_dims:
+      N: 1
+      C: 16
+      M: 72
+      R: 1
+      S: 1
+      P: 56
+      Q: 56
+  - id: block1_depthwise
+    op_type: depthwise_conv2d
+    yaml_file: layer7_features_2_block_1_0.yaml
+    tensor_dims:
+      N: 1
+      C: 72
+      M: 72
+      G: 72
+      R: 3
+      S: 3
+      P: 28
+      Q: 28
+  - id: block1_project
+    op_type: pointwise_conv2d
+    yaml_file: layer8_features_2_block_3_0.yaml
+    tensor_dims:
+      N: 1
+      C: 72
+      M: 24
+      R: 1
+      S: 1
+      P: 28
+      Q: 28
+  - id: block2_expand
+    op_type: pointwise_conv2d
+    yaml_file: layer9_features_3_block_0_0.yaml
+    tensor_dims:
+      N: 1
+      C: 24
+      M: 88
+      R: 1
+      S: 1
+      P: 28
+      Q: 28
+  - id: block2_depthwise
+    op_type: depthwise_conv2d
+    yaml_file: layer10_features_3_block_1_0.yaml
+    tensor_dims:
+      N: 1
+      C: 88
+      M: 88
+      G: 88
+      R: 3
+      S: 3
+      P: 28
+      Q: 28
+  - id: block2_project
+    op_type: pointwise_conv2d
+    yaml_file: layer11_features_3_block_3_0.yaml
+    tensor_dims:
+      N: 1
+      C: 88
+      M: 24
+      R: 1
+      S: 1
+      P: 28
+      Q: 28
+  - id: block2_residual_add
+    op_type: residual_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 24
+      H: 28
+      W: 28
+  - id: block3_expand
+    op_type: pointwise_conv2d
+    yaml_file: layer12_features_4_block_0_0.yaml
+    tensor_dims:
+      N: 1
+      C: 24
+      M: 96
+      R: 1
+      S: 1
+      P: 28
+      Q: 28
+  - id: block3_depthwise
+    op_type: depthwise_conv2d
+    yaml_file: layer13_features_4_block_1_0.yaml
+    tensor_dims:
+      N: 1
+      C: 96
+      M: 96
+      G: 96
+      R: 5
+      S: 5
+      P: 14
+      Q: 14
+  - id: block3_se_fc1
+    op_type: pointwise_conv2d
+    yaml_file: layer14_features_4_block_2_fc1.yaml
+    tensor_dims:
+      N: 1
+      C: 96
+      M: 24
+      R: 1
+      S: 1
+      P: 1
+      Q: 1
+  - id: block3_se_fc2
+    op_type: pointwise_conv2d
+    yaml_file: layer15_features_4_block_2_fc2.yaml
+    tensor_dims:
+      N: 1
+      C: 24
+      M: 96
+      R: 1
+      S: 1
+      P: 1
+      Q: 1
+  - id: block3_se_mul
+    op_type: elementwise_mul
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 96
+      H: 14
+      W: 14
+  - id: block3_project
+    op_type: pointwise_conv2d
+    yaml_file: layer16_features_4_block_3_0.yaml
+    tensor_dims:
+      N: 1
+      C: 96
+      M: 40
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: block4_expand
+    op_type: pointwise_conv2d
+    yaml_file: layer17_features_5_block_0_0.yaml
+    tensor_dims:
+      N: 1
+      C: 40
+      M: 240
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: block4_depthwise
+    op_type: depthwise_conv2d
+    yaml_file: layer18_features_5_block_1_0.yaml
+    tensor_dims:
+      N: 1
+      C: 240
+      M: 240
+      G: 240
+      R: 5
+      S: 5
+      P: 14
+      Q: 14
+  - id: block4_se_fc1
+    op_type: pointwise_conv2d
+    yaml_file: layer19_features_5_block_2_fc1.yaml
+    tensor_dims:
+      N: 1
+      C: 240
+      M: 60
+      R: 1
+      S: 1
+      P: 1
+      Q: 1
+  - id: block4_se_fc2
+    op_type: pointwise_conv2d
+    yaml_file: layer20_features_5_block_2_fc2.yaml
+    tensor_dims:
+      N: 1
+      C: 60
+      M: 240
+      R: 1
+      S: 1
+      P: 1
+      Q: 1
+  - id: block4_se_mul
+    op_type: elementwise_mul
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 240
+      H: 14
+      W: 14
+  - id: block4_project
+    op_type: pointwise_conv2d
+    yaml_file: layer21_features_5_block_3_0.yaml
+    tensor_dims:
+      N: 1
+      C: 240
+      M: 40
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: block4_residual_add
+    op_type: residual_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 40
+      H: 14
+      W: 14
+  - id: block5_expand
+    op_type: pointwise_conv2d
+    yaml_file: layer22_features_6_block_0_0.yaml
+    tensor_dims:
+      N: 1
+      C: 40
+      M: 240
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: block5_depthwise
+    op_type: depthwise_conv2d
+    yaml_file: layer23_features_6_block_1_0.yaml
+    tensor_dims:
+      N: 1
+      C: 240
+      M: 240
+      G: 240
+      R: 5
+      S: 5
+      P: 14
+      Q: 14
+  - id: block5_se_fc1
+    op_type: pointwise_conv2d
+    yaml_file: layer24_features_6_block_2_fc1.yaml
+    tensor_dims:
+      N: 1
+      C: 240
+      M: 60
+      R: 1
+      S: 1
+      P: 1
+      Q: 1
+  - id: block5_se_fc2
+    op_type: pointwise_conv2d
+    yaml_file: layer25_features_6_block_2_fc2.yaml
+    tensor_dims:
+      N: 1
+      C: 60
+      M: 240
+      R: 1
+      S: 1
+      P: 1
+      Q: 1
+  - id: block5_se_mul
+    op_type: elementwise_mul
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 240
+      H: 14
+      W: 14
+  - id: block5_project
+    op_type: pointwise_conv2d
+    yaml_file: layer26_features_6_block_3_0.yaml
+    tensor_dims:
+      N: 1
+      C: 240
+      M: 40
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: block5_residual_add
+    op_type: residual_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 40
+      H: 14
+      W: 14
+  - id: block6_expand
+    op_type: pointwise_conv2d
+    yaml_file: layer27_features_7_block_0_0.yaml
+    tensor_dims:
+      N: 1
+      C: 40
+      M: 120
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: block6_depthwise
+    op_type: depthwise_conv2d
+    yaml_file: layer28_features_7_block_1_0.yaml
+    tensor_dims:
+      N: 1
+      C: 120
+      M: 120
+      G: 120
+      R: 5
+      S: 5
+      P: 14
+      Q: 14
+  - id: block6_se_fc1
+    op_type: pointwise_conv2d
+    yaml_file: layer29_features_7_block_2_fc1.yaml
+    tensor_dims:
+      N: 1
+      C: 120
+      M: 30
+      R: 1
+      S: 1
+      P: 1
+      Q: 1
+  - id: block6_se_fc2
+    op_type: pointwise_conv2d
+    yaml_file: layer30_features_7_block_2_fc2.yaml
+    tensor_dims:
+      N: 1
+      C: 30
+      M: 120
+      R: 1
+      S: 1
+      P: 1
+      Q: 1
+  - id: block6_se_mul
+    op_type: elementwise_mul
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 120
+      H: 14
+      W: 14
+  - id: block6_project
+    op_type: pointwise_conv2d
+    yaml_file: layer31_features_7_block_3_0.yaml
+    tensor_dims:
+      N: 1
+      C: 120
+      M: 48
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: block7_expand
+    op_type: pointwise_conv2d
+    yaml_file: layer32_features_8_block_0_0.yaml
+    tensor_dims:
+      N: 1
+      C: 48
+      M: 144
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: block7_depthwise
+    op_type: depthwise_conv2d
+    yaml_file: layer33_features_8_block_1_0.yaml
+    tensor_dims:
+      N: 1
+      C: 144
+      M: 144
+      G: 144
+      R: 5
+      S: 5
+      P: 14
+      Q: 14
+  - id: block7_se_fc1
+    op_type: pointwise_conv2d
+    yaml_file: layer34_features_8_block_2_fc1.yaml
+    tensor_dims:
+      N: 1
+      C: 144
+      M: 36
+      R: 1
+      S: 1
+      P: 1
+      Q: 1
+  - id: block7_se_fc2
+    op_type: pointwise_conv2d
+    yaml_file: layer35_features_8_block_2_fc2.yaml
+    tensor_dims:
+      N: 1
+      C: 36
+      M: 144
+      R: 1
+      S: 1
+      P: 1
+      Q: 1
+  - id: block7_se_mul
+    op_type: elementwise_mul
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 144
+      H: 14
+      W: 14
+  - id: block7_project
+    op_type: pointwise_conv2d
+    yaml_file: layer36_features_8_block_3_0.yaml
+    tensor_dims:
+      N: 1
+      C: 144
+      M: 48
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: block7_residual_add
+    op_type: residual_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 48
+      H: 14
+      W: 14
+  - id: block8_expand
+    op_type: pointwise_conv2d
+    yaml_file: layer37_features_9_block_0_0.yaml
+    tensor_dims:
+      N: 1
+      C: 48
+      M: 288
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: block8_depthwise
+    op_type: depthwise_conv2d
+    yaml_file: layer38_features_9_block_1_0.yaml
+    tensor_dims:
+      N: 1
+      C: 288
+      M: 288
+      G: 288
+      R: 5
+      S: 5
+      P: 7
+      Q: 7
+  - id: block8_se_fc1
+    op_type: pointwise_conv2d
+    yaml_file: layer39_features_9_block_2_fc1.yaml
+    tensor_dims:
+      N: 1
+      C: 288
+      M: 72
+      R: 1
+      S: 1
+      P: 1
+      Q: 1
+  - id: block8_se_fc2
+    op_type: pointwise_conv2d
+    yaml_file: layer40_features_9_block_2_fc2.yaml
+    tensor_dims:
+      N: 1
+      C: 72
+      M: 288
+      R: 1
+      S: 1
+      P: 1
+      Q: 1
+  - id: block8_se_mul
+    op_type: elementwise_mul
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 288
+      H: 7
+      W: 7
+  - id: block8_project
+    op_type: pointwise_conv2d
+    yaml_file: layer41_features_9_block_3_0.yaml
+    tensor_dims:
+      N: 1
+      C: 288
+      M: 96
+      R: 1
+      S: 1
+      P: 7
+      Q: 7
+  - id: block9_expand
+    op_type: pointwise_conv2d
+    yaml_file: layer42_features_10_block_0_0.yaml
+    tensor_dims:
+      N: 1
+      C: 96
+      M: 576
+      R: 1
+      S: 1
+      P: 7
+      Q: 7
+  - id: block9_depthwise
+    op_type: depthwise_conv2d
+    yaml_file: layer43_features_10_block_1_0.yaml
+    tensor_dims:
+      N: 1
+      C: 576
+      M: 576
+      G: 576
+      R: 5
+      S: 5
+      P: 7
+      Q: 7
+  - id: block9_se_fc1
+    op_type: pointwise_conv2d
+    yaml_file: layer44_features_10_block_2_fc1.yaml
+    tensor_dims:
+      N: 1
+      C: 576
+      M: 144
+      R: 1
+      S: 1
+      P: 1
+      Q: 1
+  - id: block9_se_fc2
+    op_type: pointwise_conv2d
+    yaml_file: layer45_features_10_block_2_fc2.yaml
+    tensor_dims:
+      N: 1
+      C: 144
+      M: 576
+      R: 1
+      S: 1
+      P: 1
+      Q: 1
+  - id: block9_se_mul
+    op_type: elementwise_mul
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 576
+      H: 7
+      W: 7
+  - id: block9_project
+    op_type: pointwise_conv2d
+    yaml_file: layer46_features_10_block_3_0.yaml
+    tensor_dims:
+      N: 1
+      C: 576
+      M: 96
+      R: 1
+      S: 1
+      P: 7
+      Q: 7
+  - id: block9_residual_add
+    op_type: residual_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 96
+      H: 7
+      W: 7
+  - id: block10_expand
+    op_type: pointwise_conv2d
+    yaml_file: layer47_features_11_block_0_0.yaml
+    tensor_dims:
+      N: 1
+      C: 96
+      M: 576
+      R: 1
+      S: 1
+      P: 7
+      Q: 7
+  - id: block10_depthwise
+    op_type: depthwise_conv2d
+    yaml_file: layer48_features_11_block_1_0.yaml
+    tensor_dims:
+      N: 1
+      C: 576
+      M: 576
+      G: 576
+      R: 5
+      S: 5
+      P: 7
+      Q: 7
+  - id: block10_se_fc1
+    op_type: pointwise_conv2d
+    yaml_file: layer49_features_11_block_2_fc1.yaml
+    tensor_dims:
+      N: 1
+      C: 576
+      M: 144
+      R: 1
+      S: 1
+      P: 1
+      Q: 1
+  - id: block10_se_fc2
+    op_type: pointwise_conv2d
+    yaml_file: layer50_features_11_block_2_fc2.yaml
+    tensor_dims:
+      N: 1
+      C: 144
+      M: 576
+      R: 1
+      S: 1
+      P: 1
+      Q: 1
+  - id: block10_se_mul
+    op_type: elementwise_mul
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 576
+      H: 7
+      W: 7
+  - id: block10_project
+    op_type: pointwise_conv2d
+    yaml_file: layer51_features_11_block_3_0.yaml
+    tensor_dims:
+      N: 1
+      C: 576
+      M: 96
+      R: 1
+      S: 1
+      P: 7
+      Q: 7
+  - id: block10_residual_add
+    op_type: residual_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 96
+      H: 7
+      W: 7
+  - id: final_conv
+    op_type: pointwise_conv2d
+    yaml_file: layer52_features_12_0.yaml
+    tensor_dims:
+      N: 1
+      C: 96
+      M: 576
+      R: 1
+      S: 1
+      P: 7
+      Q: 7
+  - id: classifier
+    op_type: linear
+    yaml_file: layer53_classifier_0.yaml
+    tensor_dims:
+      N: 1
+      C: 576
+      M: 1024
+  - id: head
+    op_type: linear
+    yaml_file: layer54_classifier_3.yaml
+    tensor_dims:
+      N: 1
+      C: 1024
+      M: 1000
+  edges:
+  - src: stem_conv
+    dst: block0_depthwise
+    tensor_name: dw_input
+    tensor_shape:
+    - 1
+    - 16
+    - 112
+    - 112
+  - src: block0_depthwise
+    dst: block0_se_fc1
+    tensor_name: se_pool_input
+    tensor_shape:
+    - 1
+    - 16
+    - 1
+    - 1
+  - src: block0_se_fc1
+    dst: block0_se_fc2
+    tensor_name: se_reduced
+    tensor_shape:
+    - 1
+    - 4
+    - 1
+    - 1
+  - src: block0_depthwise
+    dst: block0_se_mul
+    tensor_name: dw_features
+    tensor_shape:
+    - 1
+    - 16
+    - 56
+    - 56
+  - src: block0_se_fc2
+    dst: block0_se_mul
+    tensor_name: se_scale
+    tensor_shape:
+    - 1
+    - 16
+    - 1
+    - 1
+  - src: block0_se_mul
+    dst: block0_project
+    tensor_name: proj_input
+    tensor_shape:
+    - 1
+    - 16
+    - 56
+    - 56
+  - src: block0_project
+    dst: block1_expand
+    tensor_name: expand_input
+    tensor_shape:
+    - 1
+    - 16
+    - 56
+    - 56
+  - src: block1_expand
+    dst: block1_depthwise
+    tensor_name: dw_input
+    tensor_shape:
+    - 1
+    - 72
+    - 56
+    - 56
+  - src: block1_depthwise
+    dst: block1_project
+    tensor_name: proj_input
+    tensor_shape:
+    - 1
+    - 72
+    - 28
+    - 28
+  - src: block1_project
+    dst: block2_expand
+    tensor_name: expand_input
+    tensor_shape:
+    - 1
+    - 24
+    - 28
+    - 28
+  - src: block2_expand
+    dst: block2_depthwise
+    tensor_name: dw_input
+    tensor_shape:
+    - 1
+    - 88
+    - 28
+    - 28
+  - src: block2_depthwise
+    dst: block2_project
+    tensor_name: proj_input
+    tensor_shape:
+    - 1
+    - 88
+    - 28
+    - 28
+  - src: block2_project
+    dst: block2_residual_add
+    tensor_name: proj_output
+    tensor_shape:
+    - 1
+    - 24
+    - 28
+    - 28
+  - src: block1_project
+    dst: block2_residual_add
+    tensor_name: residual
+    tensor_shape:
+    - 1
+    - 24
+    - 28
+    - 28
+  - src: block2_residual_add
+    dst: block3_expand
+    tensor_name: expand_input
+    tensor_shape:
+    - 1
+    - 24
+    - 28
+    - 28
+  - src: block3_expand
+    dst: block3_depthwise
+    tensor_name: dw_input
+    tensor_shape:
+    - 1
+    - 96
+    - 28
+    - 28
+  - src: block3_depthwise
+    dst: block3_se_fc1
+    tensor_name: se_pool_input
+    tensor_shape:
+    - 1
+    - 96
+    - 1
+    - 1
+  - src: block3_se_fc1
+    dst: block3_se_fc2
+    tensor_name: se_reduced
+    tensor_shape:
+    - 1
+    - 24
+    - 1
+    - 1
+  - src: block3_depthwise
+    dst: block3_se_mul
+    tensor_name: dw_features
+    tensor_shape:
+    - 1
+    - 96
+    - 14
+    - 14
+  - src: block3_se_fc2
+    dst: block3_se_mul
+    tensor_name: se_scale
+    tensor_shape:
+    - 1
+    - 96
+    - 1
+    - 1
+  - src: block3_se_mul
+    dst: block3_project
+    tensor_name: proj_input
+    tensor_shape:
+    - 1
+    - 96
+    - 14
+    - 14
+  - src: block3_project
+    dst: block4_expand
+    tensor_name: expand_input
+    tensor_shape:
+    - 1
+    - 40
+    - 14
+    - 14
+  - src: block4_expand
+    dst: block4_depthwise
+    tensor_name: dw_input
+    tensor_shape:
+    - 1
+    - 240
+    - 14
+    - 14
+  - src: block4_depthwise
+    dst: block4_se_fc1
+    tensor_name: se_pool_input
+    tensor_shape:
+    - 1
+    - 240
+    - 1
+    - 1
+  - src: block4_se_fc1
+    dst: block4_se_fc2
+    tensor_name: se_reduced
+    tensor_shape:
+    - 1
+    - 60
+    - 1
+    - 1
+  - src: block4_depthwise
+    dst: block4_se_mul
+    tensor_name: dw_features
+    tensor_shape:
+    - 1
+    - 240
+    - 14
+    - 14
+  - src: block4_se_fc2
+    dst: block4_se_mul
+    tensor_name: se_scale
+    tensor_shape:
+    - 1
+    - 240
+    - 1
+    - 1
+  - src: block4_se_mul
+    dst: block4_project
+    tensor_name: proj_input
+    tensor_shape:
+    - 1
+    - 240
+    - 14
+    - 14
+  - src: block4_project
+    dst: block4_residual_add
+    tensor_name: proj_output
+    tensor_shape:
+    - 1
+    - 40
+    - 14
+    - 14
+  - src: block3_project
+    dst: block4_residual_add
+    tensor_name: residual
+    tensor_shape:
+    - 1
+    - 40
+    - 14
+    - 14
+  - src: block4_residual_add
+    dst: block5_expand
+    tensor_name: expand_input
+    tensor_shape:
+    - 1
+    - 40
+    - 14
+    - 14
+  - src: block5_expand
+    dst: block5_depthwise
+    tensor_name: dw_input
+    tensor_shape:
+    - 1
+    - 240
+    - 14
+    - 14
+  - src: block5_depthwise
+    dst: block5_se_fc1
+    tensor_name: se_pool_input
+    tensor_shape:
+    - 1
+    - 240
+    - 1
+    - 1
+  - src: block5_se_fc1
+    dst: block5_se_fc2
+    tensor_name: se_reduced
+    tensor_shape:
+    - 1
+    - 60
+    - 1
+    - 1
+  - src: block5_depthwise
+    dst: block5_se_mul
+    tensor_name: dw_features
+    tensor_shape:
+    - 1
+    - 240
+    - 14
+    - 14
+  - src: block5_se_fc2
+    dst: block5_se_mul
+    tensor_name: se_scale
+    tensor_shape:
+    - 1
+    - 240
+    - 1
+    - 1
+  - src: block5_se_mul
+    dst: block5_project
+    tensor_name: proj_input
+    tensor_shape:
+    - 1
+    - 240
+    - 14
+    - 14
+  - src: block5_project
+    dst: block5_residual_add
+    tensor_name: proj_output
+    tensor_shape:
+    - 1
+    - 40
+    - 14
+    - 14
+  - src: block4_residual_add
+    dst: block5_residual_add
+    tensor_name: residual
+    tensor_shape:
+    - 1
+    - 40
+    - 14
+    - 14
+  - src: block5_residual_add
+    dst: block6_expand
+    tensor_name: expand_input
+    tensor_shape:
+    - 1
+    - 40
+    - 14
+    - 14
+  - src: block6_expand
+    dst: block6_depthwise
+    tensor_name: dw_input
+    tensor_shape:
+    - 1
+    - 120
+    - 14
+    - 14
+  - src: block6_depthwise
+    dst: block6_se_fc1
+    tensor_name: se_pool_input
+    tensor_shape:
+    - 1
+    - 120
+    - 1
+    - 1
+  - src: block6_se_fc1
+    dst: block6_se_fc2
+    tensor_name: se_reduced
+    tensor_shape:
+    - 1
+    - 30
+    - 1
+    - 1
+  - src: block6_depthwise
+    dst: block6_se_mul
+    tensor_name: dw_features
+    tensor_shape:
+    - 1
+    - 120
+    - 14
+    - 14
+  - src: block6_se_fc2
+    dst: block6_se_mul
+    tensor_name: se_scale
+    tensor_shape:
+    - 1
+    - 120
+    - 1
+    - 1
+  - src: block6_se_mul
+    dst: block6_project
+    tensor_name: proj_input
+    tensor_shape:
+    - 1
+    - 120
+    - 14
+    - 14
+  - src: block6_project
+    dst: block7_expand
+    tensor_name: expand_input
+    tensor_shape:
+    - 1
+    - 48
+    - 14
+    - 14
+  - src: block7_expand
+    dst: block7_depthwise
+    tensor_name: dw_input
+    tensor_shape:
+    - 1
+    - 144
+    - 14
+    - 14
+  - src: block7_depthwise
+    dst: block7_se_fc1
+    tensor_name: se_pool_input
+    tensor_shape:
+    - 1
+    - 144
+    - 1
+    - 1
+  - src: block7_se_fc1
+    dst: block7_se_fc2
+    tensor_name: se_reduced
+    tensor_shape:
+    - 1
+    - 36
+    - 1
+    - 1
+  - src: block7_depthwise
+    dst: block7_se_mul
+    tensor_name: dw_features
+    tensor_shape:
+    - 1
+    - 144
+    - 14
+    - 14
+  - src: block7_se_fc2
+    dst: block7_se_mul
+    tensor_name: se_scale
+    tensor_shape:
+    - 1
+    - 144
+    - 1
+    - 1
+  - src: block7_se_mul
+    dst: block7_project
+    tensor_name: proj_input
+    tensor_shape:
+    - 1
+    - 144
+    - 14
+    - 14
+  - src: block7_project
+    dst: block7_residual_add
+    tensor_name: proj_output
+    tensor_shape:
+    - 1
+    - 48
+    - 14
+    - 14
+  - src: block6_project
+    dst: block7_residual_add
+    tensor_name: residual
+    tensor_shape:
+    - 1
+    - 48
+    - 14
+    - 14
+  - src: block7_residual_add
+    dst: block8_expand
+    tensor_name: expand_input
+    tensor_shape:
+    - 1
+    - 48
+    - 14
+    - 14
+  - src: block8_expand
+    dst: block8_depthwise
+    tensor_name: dw_input
+    tensor_shape:
+    - 1
+    - 288
+    - 14
+    - 14
+  - src: block8_depthwise
+    dst: block8_se_fc1
+    tensor_name: se_pool_input
+    tensor_shape:
+    - 1
+    - 288
+    - 1
+    - 1
+  - src: block8_se_fc1
+    dst: block8_se_fc2
+    tensor_name: se_reduced
+    tensor_shape:
+    - 1
+    - 72
+    - 1
+    - 1
+  - src: block8_depthwise
+    dst: block8_se_mul
+    tensor_name: dw_features
+    tensor_shape:
+    - 1
+    - 288
+    - 7
+    - 7
+  - src: block8_se_fc2
+    dst: block8_se_mul
+    tensor_name: se_scale
+    tensor_shape:
+    - 1
+    - 288
+    - 1
+    - 1
+  - src: block8_se_mul
+    dst: block8_project
+    tensor_name: proj_input
+    tensor_shape:
+    - 1
+    - 288
+    - 7
+    - 7
+  - src: block8_project
+    dst: block9_expand
+    tensor_name: expand_input
+    tensor_shape:
+    - 1
+    - 96
+    - 7
+    - 7
+  - src: block9_expand
+    dst: block9_depthwise
+    tensor_name: dw_input
+    tensor_shape:
+    - 1
+    - 576
+    - 7
+    - 7
+  - src: block9_depthwise
+    dst: block9_se_fc1
+    tensor_name: se_pool_input
+    tensor_shape:
+    - 1
+    - 576
+    - 1
+    - 1
+  - src: block9_se_fc1
+    dst: block9_se_fc2
+    tensor_name: se_reduced
+    tensor_shape:
+    - 1
+    - 144
+    - 1
+    - 1
+  - src: block9_depthwise
+    dst: block9_se_mul
+    tensor_name: dw_features
+    tensor_shape:
+    - 1
+    - 576
+    - 7
+    - 7
+  - src: block9_se_fc2
+    dst: block9_se_mul
+    tensor_name: se_scale
+    tensor_shape:
+    - 1
+    - 576
+    - 1
+    - 1
+  - src: block9_se_mul
+    dst: block9_project
+    tensor_name: proj_input
+    tensor_shape:
+    - 1
+    - 576
+    - 7
+    - 7
+  - src: block9_project
+    dst: block9_residual_add
+    tensor_name: proj_output
+    tensor_shape:
+    - 1
+    - 96
+    - 7
+    - 7
+  - src: block8_project
+    dst: block9_residual_add
+    tensor_name: residual
+    tensor_shape:
+    - 1
+    - 96
+    - 7
+    - 7
+  - src: block9_residual_add
+    dst: block10_expand
+    tensor_name: expand_input
+    tensor_shape:
+    - 1
+    - 96
+    - 7
+    - 7
+  - src: block10_expand
+    dst: block10_depthwise
+    tensor_name: dw_input
+    tensor_shape:
+    - 1
+    - 576
+    - 7
+    - 7
+  - src: block10_depthwise
+    dst: block10_se_fc1
+    tensor_name: se_pool_input
+    tensor_shape:
+    - 1
+    - 576
+    - 1
+    - 1
+  - src: block10_se_fc1
+    dst: block10_se_fc2
+    tensor_name: se_reduced
+    tensor_shape:
+    - 1
+    - 144
+    - 1
+    - 1
+  - src: block10_depthwise
+    dst: block10_se_mul
+    tensor_name: dw_features
+    tensor_shape:
+    - 1
+    - 576
+    - 7
+    - 7
+  - src: block10_se_fc2
+    dst: block10_se_mul
+    tensor_name: se_scale
+    tensor_shape:
+    - 1
+    - 576
+    - 1
+    - 1
+  - src: block10_se_mul
+    dst: block10_project
+    tensor_name: proj_input
+    tensor_shape:
+    - 1
+    - 576
+    - 7
+    - 7
+  - src: block10_project
+    dst: block10_residual_add
+    tensor_name: proj_output
+    tensor_shape:
+    - 1
+    - 96
+    - 7
+    - 7
+  - src: block9_residual_add
+    dst: block10_residual_add
+    tensor_name: residual
+    tensor_shape:
+    - 1
+    - 96
+    - 7
+    - 7
+  - src: block10_residual_add
+    dst: final_conv
+    tensor_name: final_features
+    tensor_shape:
+    - 1
+    - 96
+    - 7
+    - 7
+  - src: final_conv
+    dst: classifier
+    tensor_name: pooled
+    tensor_shape:
+    - 1
+    - 576
+  - src: classifier
+    dst: head
+    tensor_name: features
+    tensor_shape:
+    - 1
+    - 1024

@@ -1,0 +1,264 @@
+dag:
+  model_name: llama3.1_70b
+  num_nodes: 13
+  num_edges: 17
+  topological_order:
+  - layer0_input
+  - layer0_k_proj
+  - layer0_q_proj
+  - layer0_attn_qk
+  - layer0_v_proj
+  - layer0_attn_v
+  - layer0_o_proj
+  - layer0_attn_residual_add
+  - layer0_gate_proj
+  - layer0_up_proj
+  - layer0_down_proj
+  - layer0_mlp_residual_add
+  - lm_head
+  parallel_levels:
+  - level: 0
+    nodes:
+    - layer0_input
+  - level: 1
+    nodes:
+    - layer0_k_proj
+    - layer0_q_proj
+    - layer0_v_proj
+  - level: 2
+    nodes:
+    - layer0_attn_qk
+  - level: 3
+    nodes:
+    - layer0_attn_v
+  - level: 4
+    nodes:
+    - layer0_o_proj
+  - level: 5
+    nodes:
+    - layer0_attn_residual_add
+  - level: 6
+    nodes:
+    - layer0_gate_proj
+    - layer0_up_proj
+  - level: 7
+    nodes:
+    - layer0_down_proj
+  - level: 8
+    nodes:
+    - layer0_mlp_residual_add
+  - level: 9
+    nodes:
+    - lm_head
+  nodes:
+  - id: layer0_input
+    op_type: placeholder
+    yaml_file: ''
+    tensor_dims:
+      B: 1
+      N: 1
+      C: 8192
+  - id: layer0_k_proj
+    op_type: linear
+    yaml_file: layer0_k_proj.yaml
+    tensor_dims:
+      B: 1
+      N: 1
+      C: 8192
+      M: 1024
+  - id: layer0_q_proj
+    op_type: linear
+    yaml_file: layer0_q_proj.yaml
+    tensor_dims:
+      B: 1
+      N: 1
+      C: 8192
+      M: 8192
+  - id: layer0_attn_qk
+    op_type: attn_qk
+    yaml_file: layer0_attn_qk.yaml
+    tensor_dims:
+      B: 1
+      H: 64
+      Q: 1
+      K: 2048
+      D: 128
+  - id: layer0_v_proj
+    op_type: linear
+    yaml_file: layer0_k_proj.yaml
+    tensor_dims:
+      B: 1
+      N: 1
+      C: 8192
+      M: 1024
+  - id: layer0_attn_v
+    op_type: attn_v
+    yaml_file: layer0_attn_v.yaml
+    tensor_dims:
+      B: 1
+      H: 64
+      Q: 1
+      K: 2048
+      D: 128
+  - id: layer0_o_proj
+    op_type: linear
+    yaml_file: layer0_o_proj.yaml
+    tensor_dims:
+      B: 1
+      N: 1
+      C: 8192
+      M: 8192
+  - id: layer0_attn_residual_add
+    op_type: residual_add
+    yaml_file: ''
+    tensor_dims:
+      B: 1
+      N: 1
+      C: 8192
+  - id: layer0_gate_proj
+    op_type: linear
+    yaml_file: layer0_gate_proj.yaml
+    tensor_dims:
+      B: 1
+      N: 1
+      C: 8192
+      M: 28672
+  - id: layer0_up_proj
+    op_type: linear
+    yaml_file: layer0_gate_proj.yaml
+    tensor_dims:
+      B: 1
+      N: 1
+      C: 8192
+      M: 28672
+  - id: layer0_down_proj
+    op_type: linear
+    yaml_file: layer0_down_proj.yaml
+    tensor_dims:
+      B: 1
+      N: 1
+      C: 28672
+      M: 8192
+  - id: layer0_mlp_residual_add
+    op_type: residual_add
+    yaml_file: ''
+    tensor_dims:
+      B: 1
+      N: 1
+      C: 8192
+  - id: lm_head
+    op_type: linear
+    yaml_file: lm_head.yaml
+    tensor_dims:
+      B: 1
+      N: 1
+      C: 8192
+      M: 128256
+  edges:
+  - src: layer0_input
+    dst: layer0_q_proj
+    tensor_name: hidden_states
+    tensor_shape: &id001
+    - 1
+    - 1
+    - 8192
+  - src: layer0_input
+    dst: layer0_k_proj
+    tensor_name: hidden_states
+    tensor_shape: *id001
+  - src: layer0_input
+    dst: layer0_v_proj
+    tensor_name: hidden_states
+    tensor_shape: *id001
+  - src: layer0_q_proj
+    dst: layer0_attn_qk
+    tensor_name: query
+    tensor_shape:
+    - 1
+    - 64
+    - 1
+    - 128
+  - src: layer0_k_proj
+    dst: layer0_attn_qk
+    tensor_name: key
+    tensor_shape:
+    - 1
+    - 64
+    - 2048
+    - 128
+  - src: layer0_attn_qk
+    dst: layer0_attn_v
+    tensor_name: scores
+    tensor_shape:
+    - 1
+    - 64
+    - 1
+    - 2048
+  - src: layer0_v_proj
+    dst: layer0_attn_v
+    tensor_name: value
+    tensor_shape:
+    - 1
+    - 64
+    - 2048
+    - 128
+  - src: layer0_attn_v
+    dst: layer0_o_proj
+    tensor_name: attn_output
+    tensor_shape:
+    - 1
+    - 1
+    - 8192
+  - src: layer0_o_proj
+    dst: layer0_attn_residual_add
+    tensor_name: o_proj_output
+    tensor_shape: *id001
+  - src: layer0_input
+    dst: layer0_attn_residual_add
+    tensor_name: residual
+    tensor_shape: *id001
+  - src: layer0_attn_residual_add
+    dst: layer0_gate_proj
+    tensor_name: post_attn
+    tensor_shape: *id001
+  - src: layer0_attn_residual_add
+    dst: layer0_up_proj
+    tensor_name: post_attn
+    tensor_shape: *id001
+  - src: layer0_gate_proj
+    dst: layer0_down_proj
+    tensor_name: gate_output
+    tensor_shape:
+    - 1
+    - 1
+    - 28672
+  - src: layer0_up_proj
+    dst: layer0_down_proj
+    tensor_name: up_output
+    tensor_shape:
+    - 1
+    - 1
+    - 28672
+  - src: layer0_down_proj
+    dst: layer0_mlp_residual_add
+    tensor_name: down_proj_output
+    tensor_shape: *id001
+  - src: layer0_attn_residual_add
+    dst: layer0_mlp_residual_add
+    tensor_name: residual
+    tensor_shape: *id001
+  - src: layer0_mlp_residual_add
+    dst: lm_head
+    tensor_name: final_hidden
+    tensor_shape:
+    - 1
+    - 1
+    - 8192
+  repeat_blocks:
+    decoder_layer:
+      template_prefix: layer0_
+      repeat_count: 80
+      chain_input: layer0_input
+      chain_output: layer0_mlp_residual_add
+      description: Layers 0..79 are identical. Only layer 0 is expanded. Each layer's
+        output feeds the next layer's input via the residual stream.

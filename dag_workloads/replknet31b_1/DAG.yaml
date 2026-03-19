@@ -1,0 +1,2765 @@
+dag:
+  model_name: replknet31b
+  num_nodes: 113
+  num_edges: 148
+  topological_order:
+  - stem
+  - stages_0_blocks_0_pw1
+  - stages_0_blocks_0_large_kernel
+  - stages_0_blocks_0_small_kernel
+  - stages_0_blocks_0_kernel_add
+  - stages_0_blocks_0_pw2
+  - stages_0_blocks_0_residual_add
+  - stages_0_blocks_1_pw1
+  - stages_0_blocks_1_pw2
+  - stages_0_blocks_1_residual_add
+  - transition_1
+  - stages_1_blocks_0_pw1
+  - stages_1_blocks_0_large_kernel
+  - stages_1_blocks_0_small_kernel
+  - stages_1_blocks_0_kernel_add
+  - stages_1_blocks_0_pw2
+  - stages_1_blocks_0_residual_add
+  - stages_1_blocks_1_pw1
+  - stages_1_blocks_1_pw2
+  - stages_1_blocks_1_residual_add
+  - transition_2
+  - stages_2_blocks_0_pw1
+  - stages_2_blocks_0_large_kernel
+  - stages_2_blocks_0_small_kernel
+  - stages_2_blocks_0_kernel_add
+  - stages_2_blocks_0_pw2
+  - stages_2_blocks_0_residual_add
+  - stages_2_blocks_1_pw1
+  - stages_2_blocks_1_pw2
+  - stages_2_blocks_1_residual_add
+  - stages_2_blocks_2_pw1
+  - stages_2_blocks_2_large_kernel
+  - stages_2_blocks_2_small_kernel
+  - stages_2_blocks_2_kernel_add
+  - stages_2_blocks_2_pw2
+  - stages_2_blocks_2_residual_add
+  - stages_2_blocks_3_pw1
+  - stages_2_blocks_3_pw2
+  - stages_2_blocks_3_residual_add
+  - stages_2_blocks_4_pw1
+  - stages_2_blocks_4_large_kernel
+  - stages_2_blocks_4_small_kernel
+  - stages_2_blocks_4_kernel_add
+  - stages_2_blocks_4_pw2
+  - stages_2_blocks_4_residual_add
+  - stages_2_blocks_5_pw1
+  - stages_2_blocks_5_pw2
+  - stages_2_blocks_5_residual_add
+  - stages_2_blocks_6_pw1
+  - stages_2_blocks_6_large_kernel
+  - stages_2_blocks_6_small_kernel
+  - stages_2_blocks_6_kernel_add
+  - stages_2_blocks_6_pw2
+  - stages_2_blocks_6_residual_add
+  - stages_2_blocks_7_pw1
+  - stages_2_blocks_7_pw2
+  - stages_2_blocks_7_residual_add
+  - stages_2_blocks_8_pw1
+  - stages_2_blocks_8_large_kernel
+  - stages_2_blocks_8_small_kernel
+  - stages_2_blocks_8_kernel_add
+  - stages_2_blocks_8_pw2
+  - stages_2_blocks_8_residual_add
+  - stages_2_blocks_9_pw1
+  - stages_2_blocks_9_pw2
+  - stages_2_blocks_9_residual_add
+  - stages_2_blocks_10_pw1
+  - stages_2_blocks_10_large_kernel
+  - stages_2_blocks_10_small_kernel
+  - stages_2_blocks_10_kernel_add
+  - stages_2_blocks_10_pw2
+  - stages_2_blocks_10_residual_add
+  - stages_2_blocks_11_pw1
+  - stages_2_blocks_11_pw2
+  - stages_2_blocks_11_residual_add
+  - stages_2_blocks_12_pw1
+  - stages_2_blocks_12_large_kernel
+  - stages_2_blocks_12_small_kernel
+  - stages_2_blocks_12_kernel_add
+  - stages_2_blocks_12_pw2
+  - stages_2_blocks_12_residual_add
+  - stages_2_blocks_13_pw1
+  - stages_2_blocks_13_pw2
+  - stages_2_blocks_13_residual_add
+  - stages_2_blocks_14_pw1
+  - stages_2_blocks_14_large_kernel
+  - stages_2_blocks_14_small_kernel
+  - stages_2_blocks_14_kernel_add
+  - stages_2_blocks_14_pw2
+  - stages_2_blocks_14_residual_add
+  - stages_2_blocks_15_pw1
+  - stages_2_blocks_15_pw2
+  - stages_2_blocks_15_residual_add
+  - stages_2_blocks_16_pw1
+  - stages_2_blocks_16_large_kernel
+  - stages_2_blocks_16_small_kernel
+  - stages_2_blocks_16_kernel_add
+  - stages_2_blocks_16_pw2
+  - stages_2_blocks_16_residual_add
+  - stages_2_blocks_17_pw1
+  - stages_2_blocks_17_pw2
+  - stages_2_blocks_17_residual_add
+  - transition_3
+  - stages_3_blocks_0_pw1
+  - stages_3_blocks_0_large_kernel
+  - stages_3_blocks_0_small_kernel
+  - stages_3_blocks_0_kernel_add
+  - stages_3_blocks_0_pw2
+  - stages_3_blocks_0_residual_add
+  - stages_3_blocks_1_pw1
+  - stages_3_blocks_1_pw2
+  - stages_3_blocks_1_residual_add
+  - head
+  parallel_levels:
+  - level: 0
+    nodes:
+    - stem
+  - level: 1
+    nodes:
+    - stages_0_blocks_0_pw1
+  - level: 2
+    nodes:
+    - stages_0_blocks_0_large_kernel
+    - stages_0_blocks_0_small_kernel
+  - level: 3
+    nodes:
+    - stages_0_blocks_0_kernel_add
+  - level: 4
+    nodes:
+    - stages_0_blocks_0_pw2
+  - level: 5
+    nodes:
+    - stages_0_blocks_0_residual_add
+  - level: 6
+    nodes:
+    - stages_0_blocks_1_pw1
+  - level: 7
+    nodes:
+    - stages_0_blocks_1_pw2
+  - level: 8
+    nodes:
+    - stages_0_blocks_1_residual_add
+  - level: 9
+    nodes:
+    - transition_1
+  - level: 10
+    nodes:
+    - stages_1_blocks_0_pw1
+  - level: 11
+    nodes:
+    - stages_1_blocks_0_large_kernel
+    - stages_1_blocks_0_small_kernel
+  - level: 12
+    nodes:
+    - stages_1_blocks_0_kernel_add
+  - level: 13
+    nodes:
+    - stages_1_blocks_0_pw2
+  - level: 14
+    nodes:
+    - stages_1_blocks_0_residual_add
+  - level: 15
+    nodes:
+    - stages_1_blocks_1_pw1
+  - level: 16
+    nodes:
+    - stages_1_blocks_1_pw2
+  - level: 17
+    nodes:
+    - stages_1_blocks_1_residual_add
+  - level: 18
+    nodes:
+    - transition_2
+  - level: 19
+    nodes:
+    - stages_2_blocks_0_pw1
+  - level: 20
+    nodes:
+    - stages_2_blocks_0_large_kernel
+    - stages_2_blocks_0_small_kernel
+  - level: 21
+    nodes:
+    - stages_2_blocks_0_kernel_add
+  - level: 22
+    nodes:
+    - stages_2_blocks_0_pw2
+  - level: 23
+    nodes:
+    - stages_2_blocks_0_residual_add
+  - level: 24
+    nodes:
+    - stages_2_blocks_1_pw1
+  - level: 25
+    nodes:
+    - stages_2_blocks_1_pw2
+  - level: 26
+    nodes:
+    - stages_2_blocks_1_residual_add
+  - level: 27
+    nodes:
+    - stages_2_blocks_2_pw1
+  - level: 28
+    nodes:
+    - stages_2_blocks_2_large_kernel
+    - stages_2_blocks_2_small_kernel
+  - level: 29
+    nodes:
+    - stages_2_blocks_2_kernel_add
+  - level: 30
+    nodes:
+    - stages_2_blocks_2_pw2
+  - level: 31
+    nodes:
+    - stages_2_blocks_2_residual_add
+  - level: 32
+    nodes:
+    - stages_2_blocks_3_pw1
+  - level: 33
+    nodes:
+    - stages_2_blocks_3_pw2
+  - level: 34
+    nodes:
+    - stages_2_blocks_3_residual_add
+  - level: 35
+    nodes:
+    - stages_2_blocks_4_pw1
+  - level: 36
+    nodes:
+    - stages_2_blocks_4_large_kernel
+    - stages_2_blocks_4_small_kernel
+  - level: 37
+    nodes:
+    - stages_2_blocks_4_kernel_add
+  - level: 38
+    nodes:
+    - stages_2_blocks_4_pw2
+  - level: 39
+    nodes:
+    - stages_2_blocks_4_residual_add
+  - level: 40
+    nodes:
+    - stages_2_blocks_5_pw1
+  - level: 41
+    nodes:
+    - stages_2_blocks_5_pw2
+  - level: 42
+    nodes:
+    - stages_2_blocks_5_residual_add
+  - level: 43
+    nodes:
+    - stages_2_blocks_6_pw1
+  - level: 44
+    nodes:
+    - stages_2_blocks_6_large_kernel
+    - stages_2_blocks_6_small_kernel
+  - level: 45
+    nodes:
+    - stages_2_blocks_6_kernel_add
+  - level: 46
+    nodes:
+    - stages_2_blocks_6_pw2
+  - level: 47
+    nodes:
+    - stages_2_blocks_6_residual_add
+  - level: 48
+    nodes:
+    - stages_2_blocks_7_pw1
+  - level: 49
+    nodes:
+    - stages_2_blocks_7_pw2
+  - level: 50
+    nodes:
+    - stages_2_blocks_7_residual_add
+  - level: 51
+    nodes:
+    - stages_2_blocks_8_pw1
+  - level: 52
+    nodes:
+    - stages_2_blocks_8_large_kernel
+    - stages_2_blocks_8_small_kernel
+  - level: 53
+    nodes:
+    - stages_2_blocks_8_kernel_add
+  - level: 54
+    nodes:
+    - stages_2_blocks_8_pw2
+  - level: 55
+    nodes:
+    - stages_2_blocks_8_residual_add
+  - level: 56
+    nodes:
+    - stages_2_blocks_9_pw1
+  - level: 57
+    nodes:
+    - stages_2_blocks_9_pw2
+  - level: 58
+    nodes:
+    - stages_2_blocks_9_residual_add
+  - level: 59
+    nodes:
+    - stages_2_blocks_10_pw1
+  - level: 60
+    nodes:
+    - stages_2_blocks_10_large_kernel
+    - stages_2_blocks_10_small_kernel
+  - level: 61
+    nodes:
+    - stages_2_blocks_10_kernel_add
+  - level: 62
+    nodes:
+    - stages_2_blocks_10_pw2
+  - level: 63
+    nodes:
+    - stages_2_blocks_10_residual_add
+  - level: 64
+    nodes:
+    - stages_2_blocks_11_pw1
+  - level: 65
+    nodes:
+    - stages_2_blocks_11_pw2
+  - level: 66
+    nodes:
+    - stages_2_blocks_11_residual_add
+  - level: 67
+    nodes:
+    - stages_2_blocks_12_pw1
+  - level: 68
+    nodes:
+    - stages_2_blocks_12_large_kernel
+    - stages_2_blocks_12_small_kernel
+  - level: 69
+    nodes:
+    - stages_2_blocks_12_kernel_add
+  - level: 70
+    nodes:
+    - stages_2_blocks_12_pw2
+  - level: 71
+    nodes:
+    - stages_2_blocks_12_residual_add
+  - level: 72
+    nodes:
+    - stages_2_blocks_13_pw1
+  - level: 73
+    nodes:
+    - stages_2_blocks_13_pw2
+  - level: 74
+    nodes:
+    - stages_2_blocks_13_residual_add
+  - level: 75
+    nodes:
+    - stages_2_blocks_14_pw1
+  - level: 76
+    nodes:
+    - stages_2_blocks_14_large_kernel
+    - stages_2_blocks_14_small_kernel
+  - level: 77
+    nodes:
+    - stages_2_blocks_14_kernel_add
+  - level: 78
+    nodes:
+    - stages_2_blocks_14_pw2
+  - level: 79
+    nodes:
+    - stages_2_blocks_14_residual_add
+  - level: 80
+    nodes:
+    - stages_2_blocks_15_pw1
+  - level: 81
+    nodes:
+    - stages_2_blocks_15_pw2
+  - level: 82
+    nodes:
+    - stages_2_blocks_15_residual_add
+  - level: 83
+    nodes:
+    - stages_2_blocks_16_pw1
+  - level: 84
+    nodes:
+    - stages_2_blocks_16_large_kernel
+    - stages_2_blocks_16_small_kernel
+  - level: 85
+    nodes:
+    - stages_2_blocks_16_kernel_add
+  - level: 86
+    nodes:
+    - stages_2_blocks_16_pw2
+  - level: 87
+    nodes:
+    - stages_2_blocks_16_residual_add
+  - level: 88
+    nodes:
+    - stages_2_blocks_17_pw1
+  - level: 89
+    nodes:
+    - stages_2_blocks_17_pw2
+  - level: 90
+    nodes:
+    - stages_2_blocks_17_residual_add
+  - level: 91
+    nodes:
+    - transition_3
+  - level: 92
+    nodes:
+    - stages_3_blocks_0_pw1
+  - level: 93
+    nodes:
+    - stages_3_blocks_0_large_kernel
+    - stages_3_blocks_0_small_kernel
+  - level: 94
+    nodes:
+    - stages_3_blocks_0_kernel_add
+  - level: 95
+    nodes:
+    - stages_3_blocks_0_pw2
+  - level: 96
+    nodes:
+    - stages_3_blocks_0_residual_add
+  - level: 97
+    nodes:
+    - stages_3_blocks_1_pw1
+  - level: 98
+    nodes:
+    - stages_3_blocks_1_pw2
+  - level: 99
+    nodes:
+    - stages_3_blocks_1_residual_add
+  - level: 100
+    nodes:
+    - head
+  nodes:
+  - id: stem
+    op_type: conv2d
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 3
+      M: 128
+      P: 56
+      Q: 56
+  - id: stages_0_blocks_0_pw1
+    op_type: pointwise_conv2d
+    yaml_file: layer1_stages_0_blocks_0_pw1_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 128
+      M: 128
+      R: 1
+      S: 1
+      P: 56
+      Q: 56
+  - id: stages_0_blocks_0_large_kernel
+    op_type: depthwise_conv2d
+    yaml_file: layer2_stages_0_blocks_0_large_kernel_lkb_origin_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 128
+      M: 128
+      G: 128
+      R: 31
+      S: 31
+      P: 56
+      Q: 56
+  - id: stages_0_blocks_0_small_kernel
+    op_type: depthwise_conv2d
+    yaml_file: layer3_stages_0_blocks_0_large_kernel_small_conv_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 128
+      M: 128
+      G: 128
+      R: 5
+      S: 5
+      P: 56
+      Q: 56
+  - id: stages_0_blocks_0_kernel_add
+    op_type: elementwise_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 128
+      H: 56
+      W: 56
+  - id: stages_0_blocks_0_pw2
+    op_type: pointwise_conv2d
+    yaml_file: layer4_stages_0_blocks_0_pw2_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 128
+      M: 128
+      R: 1
+      S: 1
+      P: 56
+      Q: 56
+  - id: stages_0_blocks_0_residual_add
+    op_type: residual_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 128
+      H: 56
+      W: 56
+  - id: stages_0_blocks_1_pw1
+    op_type: pointwise_conv2d
+    yaml_file: layer5_stages_0_blocks_1_pw1_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 128
+      M: 128
+      R: 1
+      S: 1
+      P: 56
+      Q: 56
+  - id: stages_0_blocks_1_pw2
+    op_type: pointwise_conv2d
+    yaml_file: layer6_stages_0_blocks_1_pw2_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 128
+      M: 128
+      R: 1
+      S: 1
+      P: 56
+      Q: 56
+  - id: stages_0_blocks_1_residual_add
+    op_type: residual_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 128
+      H: 56
+      W: 56
+  - id: transition_1
+    op_type: conv2d
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 128
+      M: 256
+      P: 28
+      Q: 28
+  - id: stages_1_blocks_0_pw1
+    op_type: pointwise_conv2d
+    yaml_file: layer7_stages_1_blocks_0_pw1_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 256
+      M: 256
+      R: 1
+      S: 1
+      P: 28
+      Q: 28
+  - id: stages_1_blocks_0_large_kernel
+    op_type: depthwise_conv2d
+    yaml_file: layer8_stages_1_blocks_0_large_kernel_lkb_origin_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 256
+      M: 256
+      G: 256
+      R: 29
+      S: 29
+      P: 28
+      Q: 28
+  - id: stages_1_blocks_0_small_kernel
+    op_type: depthwise_conv2d
+    yaml_file: layer9_stages_1_blocks_0_large_kernel_small_conv_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 256
+      M: 256
+      G: 256
+      R: 5
+      S: 5
+      P: 28
+      Q: 28
+  - id: stages_1_blocks_0_kernel_add
+    op_type: elementwise_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 256
+      H: 28
+      W: 28
+  - id: stages_1_blocks_0_pw2
+    op_type: pointwise_conv2d
+    yaml_file: layer10_stages_1_blocks_0_pw2_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 256
+      M: 256
+      R: 1
+      S: 1
+      P: 28
+      Q: 28
+  - id: stages_1_blocks_0_residual_add
+    op_type: residual_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 256
+      H: 28
+      W: 28
+  - id: stages_1_blocks_1_pw1
+    op_type: pointwise_conv2d
+    yaml_file: layer11_stages_1_blocks_1_pw1_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 256
+      M: 256
+      R: 1
+      S: 1
+      P: 28
+      Q: 28
+  - id: stages_1_blocks_1_pw2
+    op_type: pointwise_conv2d
+    yaml_file: layer12_stages_1_blocks_1_pw2_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 256
+      M: 256
+      R: 1
+      S: 1
+      P: 28
+      Q: 28
+  - id: stages_1_blocks_1_residual_add
+    op_type: residual_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 256
+      H: 28
+      W: 28
+  - id: transition_2
+    op_type: conv2d
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 256
+      M: 512
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_0_pw1
+    op_type: pointwise_conv2d
+    yaml_file: layer13_stages_2_blocks_0_pw1_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_0_large_kernel
+    op_type: depthwise_conv2d
+    yaml_file: layer14_stages_2_blocks_0_large_kernel_lkb_origin_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      G: 512
+      R: 27
+      S: 27
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_0_small_kernel
+    op_type: depthwise_conv2d
+    yaml_file: layer15_stages_2_blocks_0_large_kernel_small_conv_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      G: 512
+      R: 5
+      S: 5
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_0_kernel_add
+    op_type: elementwise_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 512
+      H: 14
+      W: 14
+  - id: stages_2_blocks_0_pw2
+    op_type: pointwise_conv2d
+    yaml_file: layer16_stages_2_blocks_0_pw2_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_0_residual_add
+    op_type: residual_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 512
+      H: 14
+      W: 14
+  - id: stages_2_blocks_1_pw1
+    op_type: pointwise_conv2d
+    yaml_file: layer17_stages_2_blocks_1_pw1_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_1_pw2
+    op_type: pointwise_conv2d
+    yaml_file: layer18_stages_2_blocks_1_pw2_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_1_residual_add
+    op_type: residual_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 512
+      H: 14
+      W: 14
+  - id: stages_2_blocks_2_pw1
+    op_type: pointwise_conv2d
+    yaml_file: layer19_stages_2_blocks_2_pw1_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_2_large_kernel
+    op_type: depthwise_conv2d
+    yaml_file: layer20_stages_2_blocks_2_large_kernel_lkb_origin_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      G: 512
+      R: 27
+      S: 27
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_2_small_kernel
+    op_type: depthwise_conv2d
+    yaml_file: layer21_stages_2_blocks_2_large_kernel_small_conv_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      G: 512
+      R: 5
+      S: 5
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_2_kernel_add
+    op_type: elementwise_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 512
+      H: 14
+      W: 14
+  - id: stages_2_blocks_2_pw2
+    op_type: pointwise_conv2d
+    yaml_file: layer22_stages_2_blocks_2_pw2_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_2_residual_add
+    op_type: residual_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 512
+      H: 14
+      W: 14
+  - id: stages_2_blocks_3_pw1
+    op_type: pointwise_conv2d
+    yaml_file: layer23_stages_2_blocks_3_pw1_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_3_pw2
+    op_type: pointwise_conv2d
+    yaml_file: layer24_stages_2_blocks_3_pw2_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_3_residual_add
+    op_type: residual_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 512
+      H: 14
+      W: 14
+  - id: stages_2_blocks_4_pw1
+    op_type: pointwise_conv2d
+    yaml_file: layer25_stages_2_blocks_4_pw1_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_4_large_kernel
+    op_type: depthwise_conv2d
+    yaml_file: layer26_stages_2_blocks_4_large_kernel_lkb_origin_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      G: 512
+      R: 27
+      S: 27
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_4_small_kernel
+    op_type: depthwise_conv2d
+    yaml_file: layer27_stages_2_blocks_4_large_kernel_small_conv_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      G: 512
+      R: 5
+      S: 5
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_4_kernel_add
+    op_type: elementwise_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 512
+      H: 14
+      W: 14
+  - id: stages_2_blocks_4_pw2
+    op_type: pointwise_conv2d
+    yaml_file: layer28_stages_2_blocks_4_pw2_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_4_residual_add
+    op_type: residual_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 512
+      H: 14
+      W: 14
+  - id: stages_2_blocks_5_pw1
+    op_type: pointwise_conv2d
+    yaml_file: layer29_stages_2_blocks_5_pw1_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_5_pw2
+    op_type: pointwise_conv2d
+    yaml_file: layer30_stages_2_blocks_5_pw2_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_5_residual_add
+    op_type: residual_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 512
+      H: 14
+      W: 14
+  - id: stages_2_blocks_6_pw1
+    op_type: pointwise_conv2d
+    yaml_file: layer31_stages_2_blocks_6_pw1_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_6_large_kernel
+    op_type: depthwise_conv2d
+    yaml_file: layer32_stages_2_blocks_6_large_kernel_lkb_origin_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      G: 512
+      R: 27
+      S: 27
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_6_small_kernel
+    op_type: depthwise_conv2d
+    yaml_file: layer33_stages_2_blocks_6_large_kernel_small_conv_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      G: 512
+      R: 5
+      S: 5
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_6_kernel_add
+    op_type: elementwise_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 512
+      H: 14
+      W: 14
+  - id: stages_2_blocks_6_pw2
+    op_type: pointwise_conv2d
+    yaml_file: layer34_stages_2_blocks_6_pw2_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_6_residual_add
+    op_type: residual_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 512
+      H: 14
+      W: 14
+  - id: stages_2_blocks_7_pw1
+    op_type: pointwise_conv2d
+    yaml_file: layer35_stages_2_blocks_7_pw1_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_7_pw2
+    op_type: pointwise_conv2d
+    yaml_file: layer36_stages_2_blocks_7_pw2_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_7_residual_add
+    op_type: residual_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 512
+      H: 14
+      W: 14
+  - id: stages_2_blocks_8_pw1
+    op_type: pointwise_conv2d
+    yaml_file: layer37_stages_2_blocks_8_pw1_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_8_large_kernel
+    op_type: depthwise_conv2d
+    yaml_file: layer38_stages_2_blocks_8_large_kernel_lkb_origin_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      G: 512
+      R: 27
+      S: 27
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_8_small_kernel
+    op_type: depthwise_conv2d
+    yaml_file: layer39_stages_2_blocks_8_large_kernel_small_conv_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      G: 512
+      R: 5
+      S: 5
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_8_kernel_add
+    op_type: elementwise_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 512
+      H: 14
+      W: 14
+  - id: stages_2_blocks_8_pw2
+    op_type: pointwise_conv2d
+    yaml_file: layer40_stages_2_blocks_8_pw2_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_8_residual_add
+    op_type: residual_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 512
+      H: 14
+      W: 14
+  - id: stages_2_blocks_9_pw1
+    op_type: pointwise_conv2d
+    yaml_file: layer41_stages_2_blocks_9_pw1_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_9_pw2
+    op_type: pointwise_conv2d
+    yaml_file: layer42_stages_2_blocks_9_pw2_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_9_residual_add
+    op_type: residual_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 512
+      H: 14
+      W: 14
+  - id: stages_2_blocks_10_pw1
+    op_type: pointwise_conv2d
+    yaml_file: layer43_stages_2_blocks_10_pw1_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_10_large_kernel
+    op_type: depthwise_conv2d
+    yaml_file: layer44_stages_2_blocks_10_large_kernel_lkb_origin_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      G: 512
+      R: 27
+      S: 27
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_10_small_kernel
+    op_type: depthwise_conv2d
+    yaml_file: layer45_stages_2_blocks_10_large_kernel_small_conv_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      G: 512
+      R: 5
+      S: 5
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_10_kernel_add
+    op_type: elementwise_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 512
+      H: 14
+      W: 14
+  - id: stages_2_blocks_10_pw2
+    op_type: pointwise_conv2d
+    yaml_file: layer46_stages_2_blocks_10_pw2_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_10_residual_add
+    op_type: residual_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 512
+      H: 14
+      W: 14
+  - id: stages_2_blocks_11_pw1
+    op_type: pointwise_conv2d
+    yaml_file: layer47_stages_2_blocks_11_pw1_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_11_pw2
+    op_type: pointwise_conv2d
+    yaml_file: layer48_stages_2_blocks_11_pw2_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_11_residual_add
+    op_type: residual_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 512
+      H: 14
+      W: 14
+  - id: stages_2_blocks_12_pw1
+    op_type: pointwise_conv2d
+    yaml_file: layer49_stages_2_blocks_12_pw1_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_12_large_kernel
+    op_type: depthwise_conv2d
+    yaml_file: layer50_stages_2_blocks_12_large_kernel_lkb_origin_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      G: 512
+      R: 27
+      S: 27
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_12_small_kernel
+    op_type: depthwise_conv2d
+    yaml_file: layer51_stages_2_blocks_12_large_kernel_small_conv_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      G: 512
+      R: 5
+      S: 5
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_12_kernel_add
+    op_type: elementwise_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 512
+      H: 14
+      W: 14
+  - id: stages_2_blocks_12_pw2
+    op_type: pointwise_conv2d
+    yaml_file: layer52_stages_2_blocks_12_pw2_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_12_residual_add
+    op_type: residual_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 512
+      H: 14
+      W: 14
+  - id: stages_2_blocks_13_pw1
+    op_type: pointwise_conv2d
+    yaml_file: layer53_stages_2_blocks_13_pw1_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_13_pw2
+    op_type: pointwise_conv2d
+    yaml_file: layer54_stages_2_blocks_13_pw2_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_13_residual_add
+    op_type: residual_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 512
+      H: 14
+      W: 14
+  - id: stages_2_blocks_14_pw1
+    op_type: pointwise_conv2d
+    yaml_file: layer55_stages_2_blocks_14_pw1_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_14_large_kernel
+    op_type: depthwise_conv2d
+    yaml_file: layer56_stages_2_blocks_14_large_kernel_lkb_origin_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      G: 512
+      R: 27
+      S: 27
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_14_small_kernel
+    op_type: depthwise_conv2d
+    yaml_file: layer57_stages_2_blocks_14_large_kernel_small_conv_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      G: 512
+      R: 5
+      S: 5
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_14_kernel_add
+    op_type: elementwise_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 512
+      H: 14
+      W: 14
+  - id: stages_2_blocks_14_pw2
+    op_type: pointwise_conv2d
+    yaml_file: layer58_stages_2_blocks_14_pw2_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_14_residual_add
+    op_type: residual_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 512
+      H: 14
+      W: 14
+  - id: stages_2_blocks_15_pw1
+    op_type: pointwise_conv2d
+    yaml_file: layer59_stages_2_blocks_15_pw1_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_15_pw2
+    op_type: pointwise_conv2d
+    yaml_file: layer60_stages_2_blocks_15_pw2_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_15_residual_add
+    op_type: residual_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 512
+      H: 14
+      W: 14
+  - id: stages_2_blocks_16_pw1
+    op_type: pointwise_conv2d
+    yaml_file: layer61_stages_2_blocks_16_pw1_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_16_large_kernel
+    op_type: depthwise_conv2d
+    yaml_file: layer62_stages_2_blocks_16_large_kernel_lkb_origin_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      G: 512
+      R: 27
+      S: 27
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_16_small_kernel
+    op_type: depthwise_conv2d
+    yaml_file: layer63_stages_2_blocks_16_large_kernel_small_conv_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      G: 512
+      R: 5
+      S: 5
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_16_kernel_add
+    op_type: elementwise_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 512
+      H: 14
+      W: 14
+  - id: stages_2_blocks_16_pw2
+    op_type: pointwise_conv2d
+    yaml_file: layer64_stages_2_blocks_16_pw2_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_16_residual_add
+    op_type: residual_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 512
+      H: 14
+      W: 14
+  - id: stages_2_blocks_17_pw1
+    op_type: pointwise_conv2d
+    yaml_file: layer65_stages_2_blocks_17_pw1_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_17_pw2
+    op_type: pointwise_conv2d
+    yaml_file: layer66_stages_2_blocks_17_pw2_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 512
+      R: 1
+      S: 1
+      P: 14
+      Q: 14
+  - id: stages_2_blocks_17_residual_add
+    op_type: residual_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 512
+      H: 14
+      W: 14
+  - id: transition_3
+    op_type: conv2d
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 512
+      M: 1024
+      P: 7
+      Q: 7
+  - id: stages_3_blocks_0_pw1
+    op_type: pointwise_conv2d
+    yaml_file: layer67_stages_3_blocks_0_pw1_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 1024
+      M: 1024
+      R: 1
+      S: 1
+      P: 7
+      Q: 7
+  - id: stages_3_blocks_0_large_kernel
+    op_type: depthwise_conv2d
+    yaml_file: layer68_stages_3_blocks_0_large_kernel_lkb_origin_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 1024
+      M: 1024
+      G: 1024
+      R: 13
+      S: 13
+      P: 7
+      Q: 7
+  - id: stages_3_blocks_0_small_kernel
+    op_type: depthwise_conv2d
+    yaml_file: layer69_stages_3_blocks_0_large_kernel_small_conv_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 1024
+      M: 1024
+      G: 1024
+      R: 5
+      S: 5
+      P: 7
+      Q: 7
+  - id: stages_3_blocks_0_kernel_add
+    op_type: elementwise_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 1024
+      H: 7
+      W: 7
+  - id: stages_3_blocks_0_pw2
+    op_type: pointwise_conv2d
+    yaml_file: layer70_stages_3_blocks_0_pw2_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 1024
+      M: 1024
+      R: 1
+      S: 1
+      P: 7
+      Q: 7
+  - id: stages_3_blocks_0_residual_add
+    op_type: residual_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 1024
+      H: 7
+      W: 7
+  - id: stages_3_blocks_1_pw1
+    op_type: pointwise_conv2d
+    yaml_file: layer71_stages_3_blocks_1_pw1_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 1024
+      M: 1024
+      R: 1
+      S: 1
+      P: 7
+      Q: 7
+  - id: stages_3_blocks_1_pw2
+    op_type: pointwise_conv2d
+    yaml_file: layer72_stages_3_blocks_1_pw2_conv.yaml
+    tensor_dims:
+      N: 1
+      C: 1024
+      M: 1024
+      R: 1
+      S: 1
+      P: 7
+      Q: 7
+  - id: stages_3_blocks_1_residual_add
+    op_type: residual_add
+    yaml_file: ''
+    tensor_dims:
+      N: 1
+      C: 1024
+      H: 7
+      W: 7
+  - id: head
+    op_type: linear
+    yaml_file: layer73_head.yaml
+    tensor_dims:
+      N: 1
+      C: 1024
+      M: 1000
+  edges:
+  - src: stem
+    dst: stages_0_blocks_0_pw1
+    tensor_name: pw1_input
+    tensor_shape:
+    - 1
+    - 128
+    - 56
+    - 56
+  - src: stages_0_blocks_0_pw1
+    dst: stages_0_blocks_0_large_kernel
+    tensor_name: to_large_kernel
+    tensor_shape:
+    - 1
+    - 128
+    - 56
+    - 56
+  - src: stages_0_blocks_0_pw1
+    dst: stages_0_blocks_0_small_kernel
+    tensor_name: to_small_kernel
+    tensor_shape:
+    - 1
+    - 128
+    - 56
+    - 56
+  - src: stages_0_blocks_0_large_kernel
+    dst: stages_0_blocks_0_kernel_add
+    tensor_name: large_kernel_out
+    tensor_shape:
+    - 1
+    - 128
+    - 56
+    - 56
+  - src: stages_0_blocks_0_small_kernel
+    dst: stages_0_blocks_0_kernel_add
+    tensor_name: small_kernel_out
+    tensor_shape:
+    - 1
+    - 128
+    - 56
+    - 56
+  - src: stages_0_blocks_0_kernel_add
+    dst: stages_0_blocks_0_pw2
+    tensor_name: pw2_input
+    tensor_shape:
+    - 1
+    - 128
+    - 56
+    - 56
+  - src: stages_0_blocks_0_pw2
+    dst: stages_0_blocks_0_residual_add
+    tensor_name: pw2_output
+    tensor_shape:
+    - 1
+    - 128
+    - 56
+    - 56
+  - src: stem
+    dst: stages_0_blocks_0_residual_add
+    tensor_name: residual
+    tensor_shape:
+    - 1
+    - 128
+    - 56
+    - 56
+  - src: stages_0_blocks_0_residual_add
+    dst: stages_0_blocks_1_pw1
+    tensor_name: pw1_input
+    tensor_shape:
+    - 1
+    - 128
+    - 56
+    - 56
+  - src: stages_0_blocks_1_pw1
+    dst: stages_0_blocks_1_pw2
+    tensor_name: pw2_input
+    tensor_shape:
+    - 1
+    - 128
+    - 56
+    - 56
+  - src: stages_0_blocks_1_pw2
+    dst: stages_0_blocks_1_residual_add
+    tensor_name: pw2_output
+    tensor_shape:
+    - 1
+    - 128
+    - 56
+    - 56
+  - src: stages_0_blocks_0_residual_add
+    dst: stages_0_blocks_1_residual_add
+    tensor_name: residual
+    tensor_shape:
+    - 1
+    - 128
+    - 56
+    - 56
+  - src: stages_0_blocks_1_residual_add
+    dst: transition_1
+    tensor_name: stage_transition
+    tensor_shape:
+    - 1
+    - 128
+    - 56
+    - 56
+  - src: transition_1
+    dst: stages_1_blocks_0_pw1
+    tensor_name: pw1_input
+    tensor_shape:
+    - 1
+    - 256
+    - 28
+    - 28
+  - src: stages_1_blocks_0_pw1
+    dst: stages_1_blocks_0_large_kernel
+    tensor_name: to_large_kernel
+    tensor_shape:
+    - 1
+    - 256
+    - 28
+    - 28
+  - src: stages_1_blocks_0_pw1
+    dst: stages_1_blocks_0_small_kernel
+    tensor_name: to_small_kernel
+    tensor_shape:
+    - 1
+    - 256
+    - 28
+    - 28
+  - src: stages_1_blocks_0_large_kernel
+    dst: stages_1_blocks_0_kernel_add
+    tensor_name: large_kernel_out
+    tensor_shape:
+    - 1
+    - 256
+    - 28
+    - 28
+  - src: stages_1_blocks_0_small_kernel
+    dst: stages_1_blocks_0_kernel_add
+    tensor_name: small_kernel_out
+    tensor_shape:
+    - 1
+    - 256
+    - 28
+    - 28
+  - src: stages_1_blocks_0_kernel_add
+    dst: stages_1_blocks_0_pw2
+    tensor_name: pw2_input
+    tensor_shape:
+    - 1
+    - 256
+    - 28
+    - 28
+  - src: stages_1_blocks_0_pw2
+    dst: stages_1_blocks_0_residual_add
+    tensor_name: pw2_output
+    tensor_shape:
+    - 1
+    - 256
+    - 28
+    - 28
+  - src: transition_1
+    dst: stages_1_blocks_0_residual_add
+    tensor_name: residual
+    tensor_shape:
+    - 1
+    - 256
+    - 28
+    - 28
+  - src: stages_1_blocks_0_residual_add
+    dst: stages_1_blocks_1_pw1
+    tensor_name: pw1_input
+    tensor_shape:
+    - 1
+    - 256
+    - 28
+    - 28
+  - src: stages_1_blocks_1_pw1
+    dst: stages_1_blocks_1_pw2
+    tensor_name: pw2_input
+    tensor_shape:
+    - 1
+    - 256
+    - 28
+    - 28
+  - src: stages_1_blocks_1_pw2
+    dst: stages_1_blocks_1_residual_add
+    tensor_name: pw2_output
+    tensor_shape:
+    - 1
+    - 256
+    - 28
+    - 28
+  - src: stages_1_blocks_0_residual_add
+    dst: stages_1_blocks_1_residual_add
+    tensor_name: residual
+    tensor_shape:
+    - 1
+    - 256
+    - 28
+    - 28
+  - src: stages_1_blocks_1_residual_add
+    dst: transition_2
+    tensor_name: stage_transition
+    tensor_shape:
+    - 1
+    - 256
+    - 28
+    - 28
+  - src: transition_2
+    dst: stages_2_blocks_0_pw1
+    tensor_name: pw1_input
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_0_pw1
+    dst: stages_2_blocks_0_large_kernel
+    tensor_name: to_large_kernel
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_0_pw1
+    dst: stages_2_blocks_0_small_kernel
+    tensor_name: to_small_kernel
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_0_large_kernel
+    dst: stages_2_blocks_0_kernel_add
+    tensor_name: large_kernel_out
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_0_small_kernel
+    dst: stages_2_blocks_0_kernel_add
+    tensor_name: small_kernel_out
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_0_kernel_add
+    dst: stages_2_blocks_0_pw2
+    tensor_name: pw2_input
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_0_pw2
+    dst: stages_2_blocks_0_residual_add
+    tensor_name: pw2_output
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: transition_2
+    dst: stages_2_blocks_0_residual_add
+    tensor_name: residual
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_0_residual_add
+    dst: stages_2_blocks_1_pw1
+    tensor_name: pw1_input
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_1_pw1
+    dst: stages_2_blocks_1_pw2
+    tensor_name: pw2_input
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_1_pw2
+    dst: stages_2_blocks_1_residual_add
+    tensor_name: pw2_output
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_0_residual_add
+    dst: stages_2_blocks_1_residual_add
+    tensor_name: residual
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_1_residual_add
+    dst: stages_2_blocks_2_pw1
+    tensor_name: pw1_input
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_2_pw1
+    dst: stages_2_blocks_2_large_kernel
+    tensor_name: to_large_kernel
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_2_pw1
+    dst: stages_2_blocks_2_small_kernel
+    tensor_name: to_small_kernel
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_2_large_kernel
+    dst: stages_2_blocks_2_kernel_add
+    tensor_name: large_kernel_out
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_2_small_kernel
+    dst: stages_2_blocks_2_kernel_add
+    tensor_name: small_kernel_out
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_2_kernel_add
+    dst: stages_2_blocks_2_pw2
+    tensor_name: pw2_input
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_2_pw2
+    dst: stages_2_blocks_2_residual_add
+    tensor_name: pw2_output
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_1_residual_add
+    dst: stages_2_blocks_2_residual_add
+    tensor_name: residual
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_2_residual_add
+    dst: stages_2_blocks_3_pw1
+    tensor_name: pw1_input
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_3_pw1
+    dst: stages_2_blocks_3_pw2
+    tensor_name: pw2_input
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_3_pw2
+    dst: stages_2_blocks_3_residual_add
+    tensor_name: pw2_output
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_2_residual_add
+    dst: stages_2_blocks_3_residual_add
+    tensor_name: residual
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_3_residual_add
+    dst: stages_2_blocks_4_pw1
+    tensor_name: pw1_input
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_4_pw1
+    dst: stages_2_blocks_4_large_kernel
+    tensor_name: to_large_kernel
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_4_pw1
+    dst: stages_2_blocks_4_small_kernel
+    tensor_name: to_small_kernel
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_4_large_kernel
+    dst: stages_2_blocks_4_kernel_add
+    tensor_name: large_kernel_out
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_4_small_kernel
+    dst: stages_2_blocks_4_kernel_add
+    tensor_name: small_kernel_out
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_4_kernel_add
+    dst: stages_2_blocks_4_pw2
+    tensor_name: pw2_input
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_4_pw2
+    dst: stages_2_blocks_4_residual_add
+    tensor_name: pw2_output
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_3_residual_add
+    dst: stages_2_blocks_4_residual_add
+    tensor_name: residual
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_4_residual_add
+    dst: stages_2_blocks_5_pw1
+    tensor_name: pw1_input
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_5_pw1
+    dst: stages_2_blocks_5_pw2
+    tensor_name: pw2_input
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_5_pw2
+    dst: stages_2_blocks_5_residual_add
+    tensor_name: pw2_output
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_4_residual_add
+    dst: stages_2_blocks_5_residual_add
+    tensor_name: residual
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_5_residual_add
+    dst: stages_2_blocks_6_pw1
+    tensor_name: pw1_input
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_6_pw1
+    dst: stages_2_blocks_6_large_kernel
+    tensor_name: to_large_kernel
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_6_pw1
+    dst: stages_2_blocks_6_small_kernel
+    tensor_name: to_small_kernel
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_6_large_kernel
+    dst: stages_2_blocks_6_kernel_add
+    tensor_name: large_kernel_out
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_6_small_kernel
+    dst: stages_2_blocks_6_kernel_add
+    tensor_name: small_kernel_out
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_6_kernel_add
+    dst: stages_2_blocks_6_pw2
+    tensor_name: pw2_input
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_6_pw2
+    dst: stages_2_blocks_6_residual_add
+    tensor_name: pw2_output
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_5_residual_add
+    dst: stages_2_blocks_6_residual_add
+    tensor_name: residual
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_6_residual_add
+    dst: stages_2_blocks_7_pw1
+    tensor_name: pw1_input
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_7_pw1
+    dst: stages_2_blocks_7_pw2
+    tensor_name: pw2_input
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_7_pw2
+    dst: stages_2_blocks_7_residual_add
+    tensor_name: pw2_output
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_6_residual_add
+    dst: stages_2_blocks_7_residual_add
+    tensor_name: residual
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_7_residual_add
+    dst: stages_2_blocks_8_pw1
+    tensor_name: pw1_input
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_8_pw1
+    dst: stages_2_blocks_8_large_kernel
+    tensor_name: to_large_kernel
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_8_pw1
+    dst: stages_2_blocks_8_small_kernel
+    tensor_name: to_small_kernel
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_8_large_kernel
+    dst: stages_2_blocks_8_kernel_add
+    tensor_name: large_kernel_out
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_8_small_kernel
+    dst: stages_2_blocks_8_kernel_add
+    tensor_name: small_kernel_out
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_8_kernel_add
+    dst: stages_2_blocks_8_pw2
+    tensor_name: pw2_input
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_8_pw2
+    dst: stages_2_blocks_8_residual_add
+    tensor_name: pw2_output
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_7_residual_add
+    dst: stages_2_blocks_8_residual_add
+    tensor_name: residual
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_8_residual_add
+    dst: stages_2_blocks_9_pw1
+    tensor_name: pw1_input
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_9_pw1
+    dst: stages_2_blocks_9_pw2
+    tensor_name: pw2_input
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_9_pw2
+    dst: stages_2_blocks_9_residual_add
+    tensor_name: pw2_output
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_8_residual_add
+    dst: stages_2_blocks_9_residual_add
+    tensor_name: residual
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_9_residual_add
+    dst: stages_2_blocks_10_pw1
+    tensor_name: pw1_input
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_10_pw1
+    dst: stages_2_blocks_10_large_kernel
+    tensor_name: to_large_kernel
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_10_pw1
+    dst: stages_2_blocks_10_small_kernel
+    tensor_name: to_small_kernel
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_10_large_kernel
+    dst: stages_2_blocks_10_kernel_add
+    tensor_name: large_kernel_out
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_10_small_kernel
+    dst: stages_2_blocks_10_kernel_add
+    tensor_name: small_kernel_out
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_10_kernel_add
+    dst: stages_2_blocks_10_pw2
+    tensor_name: pw2_input
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_10_pw2
+    dst: stages_2_blocks_10_residual_add
+    tensor_name: pw2_output
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_9_residual_add
+    dst: stages_2_blocks_10_residual_add
+    tensor_name: residual
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_10_residual_add
+    dst: stages_2_blocks_11_pw1
+    tensor_name: pw1_input
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_11_pw1
+    dst: stages_2_blocks_11_pw2
+    tensor_name: pw2_input
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_11_pw2
+    dst: stages_2_blocks_11_residual_add
+    tensor_name: pw2_output
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_10_residual_add
+    dst: stages_2_blocks_11_residual_add
+    tensor_name: residual
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_11_residual_add
+    dst: stages_2_blocks_12_pw1
+    tensor_name: pw1_input
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_12_pw1
+    dst: stages_2_blocks_12_large_kernel
+    tensor_name: to_large_kernel
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_12_pw1
+    dst: stages_2_blocks_12_small_kernel
+    tensor_name: to_small_kernel
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_12_large_kernel
+    dst: stages_2_blocks_12_kernel_add
+    tensor_name: large_kernel_out
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_12_small_kernel
+    dst: stages_2_blocks_12_kernel_add
+    tensor_name: small_kernel_out
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_12_kernel_add
+    dst: stages_2_blocks_12_pw2
+    tensor_name: pw2_input
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_12_pw2
+    dst: stages_2_blocks_12_residual_add
+    tensor_name: pw2_output
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_11_residual_add
+    dst: stages_2_blocks_12_residual_add
+    tensor_name: residual
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_12_residual_add
+    dst: stages_2_blocks_13_pw1
+    tensor_name: pw1_input
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_13_pw1
+    dst: stages_2_blocks_13_pw2
+    tensor_name: pw2_input
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_13_pw2
+    dst: stages_2_blocks_13_residual_add
+    tensor_name: pw2_output
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_12_residual_add
+    dst: stages_2_blocks_13_residual_add
+    tensor_name: residual
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_13_residual_add
+    dst: stages_2_blocks_14_pw1
+    tensor_name: pw1_input
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_14_pw1
+    dst: stages_2_blocks_14_large_kernel
+    tensor_name: to_large_kernel
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_14_pw1
+    dst: stages_2_blocks_14_small_kernel
+    tensor_name: to_small_kernel
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_14_large_kernel
+    dst: stages_2_blocks_14_kernel_add
+    tensor_name: large_kernel_out
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_14_small_kernel
+    dst: stages_2_blocks_14_kernel_add
+    tensor_name: small_kernel_out
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_14_kernel_add
+    dst: stages_2_blocks_14_pw2
+    tensor_name: pw2_input
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_14_pw2
+    dst: stages_2_blocks_14_residual_add
+    tensor_name: pw2_output
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_13_residual_add
+    dst: stages_2_blocks_14_residual_add
+    tensor_name: residual
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_14_residual_add
+    dst: stages_2_blocks_15_pw1
+    tensor_name: pw1_input
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_15_pw1
+    dst: stages_2_blocks_15_pw2
+    tensor_name: pw2_input
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_15_pw2
+    dst: stages_2_blocks_15_residual_add
+    tensor_name: pw2_output
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_14_residual_add
+    dst: stages_2_blocks_15_residual_add
+    tensor_name: residual
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_15_residual_add
+    dst: stages_2_blocks_16_pw1
+    tensor_name: pw1_input
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_16_pw1
+    dst: stages_2_blocks_16_large_kernel
+    tensor_name: to_large_kernel
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_16_pw1
+    dst: stages_2_blocks_16_small_kernel
+    tensor_name: to_small_kernel
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_16_large_kernel
+    dst: stages_2_blocks_16_kernel_add
+    tensor_name: large_kernel_out
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_16_small_kernel
+    dst: stages_2_blocks_16_kernel_add
+    tensor_name: small_kernel_out
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_16_kernel_add
+    dst: stages_2_blocks_16_pw2
+    tensor_name: pw2_input
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_16_pw2
+    dst: stages_2_blocks_16_residual_add
+    tensor_name: pw2_output
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_15_residual_add
+    dst: stages_2_blocks_16_residual_add
+    tensor_name: residual
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_16_residual_add
+    dst: stages_2_blocks_17_pw1
+    tensor_name: pw1_input
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_17_pw1
+    dst: stages_2_blocks_17_pw2
+    tensor_name: pw2_input
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_17_pw2
+    dst: stages_2_blocks_17_residual_add
+    tensor_name: pw2_output
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_16_residual_add
+    dst: stages_2_blocks_17_residual_add
+    tensor_name: residual
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: stages_2_blocks_17_residual_add
+    dst: transition_3
+    tensor_name: stage_transition
+    tensor_shape:
+    - 1
+    - 512
+    - 14
+    - 14
+  - src: transition_3
+    dst: stages_3_blocks_0_pw1
+    tensor_name: pw1_input
+    tensor_shape:
+    - 1
+    - 1024
+    - 7
+    - 7
+  - src: stages_3_blocks_0_pw1
+    dst: stages_3_blocks_0_large_kernel
+    tensor_name: to_large_kernel
+    tensor_shape:
+    - 1
+    - 1024
+    - 7
+    - 7
+  - src: stages_3_blocks_0_pw1
+    dst: stages_3_blocks_0_small_kernel
+    tensor_name: to_small_kernel
+    tensor_shape:
+    - 1
+    - 1024
+    - 7
+    - 7
+  - src: stages_3_blocks_0_large_kernel
+    dst: stages_3_blocks_0_kernel_add
+    tensor_name: large_kernel_out
+    tensor_shape:
+    - 1
+    - 1024
+    - 7
+    - 7
+  - src: stages_3_blocks_0_small_kernel
+    dst: stages_3_blocks_0_kernel_add
+    tensor_name: small_kernel_out
+    tensor_shape:
+    - 1
+    - 1024
+    - 7
+    - 7
+  - src: stages_3_blocks_0_kernel_add
+    dst: stages_3_blocks_0_pw2
+    tensor_name: pw2_input
+    tensor_shape:
+    - 1
+    - 1024
+    - 7
+    - 7
+  - src: stages_3_blocks_0_pw2
+    dst: stages_3_blocks_0_residual_add
+    tensor_name: pw2_output
+    tensor_shape:
+    - 1
+    - 1024
+    - 7
+    - 7
+  - src: transition_3
+    dst: stages_3_blocks_0_residual_add
+    tensor_name: residual
+    tensor_shape:
+    - 1
+    - 1024
+    - 7
+    - 7
+  - src: stages_3_blocks_0_residual_add
+    dst: stages_3_blocks_1_pw1
+    tensor_name: pw1_input
+    tensor_shape:
+    - 1
+    - 1024
+    - 7
+    - 7
+  - src: stages_3_blocks_1_pw1
+    dst: stages_3_blocks_1_pw2
+    tensor_name: pw2_input
+    tensor_shape:
+    - 1
+    - 1024
+    - 7
+    - 7
+  - src: stages_3_blocks_1_pw2
+    dst: stages_3_blocks_1_residual_add
+    tensor_name: pw2_output
+    tensor_shape:
+    - 1
+    - 1024
+    - 7
+    - 7
+  - src: stages_3_blocks_0_residual_add
+    dst: stages_3_blocks_1_residual_add
+    tensor_name: residual
+    tensor_shape:
+    - 1
+    - 1024
+    - 7
+    - 7
+  - src: stages_3_blocks_1_residual_add
+    dst: head
+    tensor_name: pooled_features
+    tensor_shape:
+    - 1
+    - 1024
