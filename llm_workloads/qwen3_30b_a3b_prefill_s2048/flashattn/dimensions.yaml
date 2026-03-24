@@ -8,9 +8,15 @@ dimensions:
   H:
     value: 32
     description: Number of attention heads
-  M:
+  K:
     value: 2048
-    description: KV sequence length
+    description: KV sequence length (K = R * T)
   Q:
     value: 2048
     description: Query sequence length
+  R:
+    value: 8
+    description: Number of KV tiles (rounds)
+  T:
+    value: 256
+    description: KV tile size

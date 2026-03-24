@@ -3,9 +3,9 @@ problem:
     B: 1
     D: 128
     H: 64
-    N: 256
     Q: 2048
-    T: 8
+    R: 8
+    T: 256
   shape:
     data_spaces:
     - name: Q
@@ -19,21 +19,21 @@ problem:
       - - - B
       - - - D
       - - - H
+      - - - R
       - - - T
-      - - - N
     - name: QK
       projection:
       - - - B
       - - - H
+      - - - R
       - - - T
-      - - - N
       - - - Q
       read_write: true
     dimensions:
     - B
     - D
     - H
+    - R
     - T
-    - N
     - Q
     name: flashattn_qk

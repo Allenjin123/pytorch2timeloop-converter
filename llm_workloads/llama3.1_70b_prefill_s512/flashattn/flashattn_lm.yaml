@@ -2,29 +2,29 @@ problem:
   instance:
     B: 1
     H: 64
-    N: 256
     Q: 512
-    T: 2
+    R: 2
+    T: 256
   shape:
     data_spaces:
     - name: QK
       projection:
       - - - B
       - - - H
+      - - - R
       - - - T
-      - - - N
       - - - Q
     - name: LM
       projection:
       - - - B
       - - - H
-      - - - T
+      - - - R
       - - - Q
       read_write: true
     dimensions:
     - B
     - H
+    - R
     - T
-    - N
     - Q
     name: flashattn_lm

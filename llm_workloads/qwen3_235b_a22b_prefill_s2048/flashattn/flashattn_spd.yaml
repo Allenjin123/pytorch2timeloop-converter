@@ -3,31 +3,31 @@ problem:
     B: 1
     H: 64
     Q: 2048
-    T: 8
+    R: 8
   shape:
     data_spaces:
     - name: PRM
       projection:
       - - - B
       - - - H
-      - - - T
+      - - - R
       - - - Q
     - name: RD0
       projection:
       - - - B
       - - - H
-      - - - T
+      - - - R
       - - - Q
     - name: SPD
       projection:
       - - - B
       - - - H
-      - - - T
+      - - - R
       - - - Q
       read_write: true
     dimensions:
     - B
     - H
-    - T
+    - R
     - Q
     name: flashattn_spd

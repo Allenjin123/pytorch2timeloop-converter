@@ -3,25 +3,25 @@ problem:
     B: 1
     D: 128
     H: 64
-    N: 256
     Q: 2048
-    T: 8
+    R: 8
+    T: 256
   shape:
     data_spaces:
     - name: SLN
       projection:
       - - - B
       - - - H
+      - - - R
       - - - T
-      - - - N
       - - - Q
     - name: BV
       projection:
       - - - B
       - - - D
       - - - H
+      - - - R
       - - - T
-      - - - N
     - name: SLNV
       projection:
       - - - B
@@ -33,7 +33,7 @@ problem:
     - B
     - D
     - H
+    - R
     - T
-    - N
     - Q
     name: flashattn_slnv

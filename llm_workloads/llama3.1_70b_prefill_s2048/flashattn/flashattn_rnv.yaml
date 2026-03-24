@@ -4,7 +4,7 @@ problem:
     D: 128
     H: 64
     Q: 2048
-    T: 8
+    R: 8
   shape:
     data_spaces:
     - name: SPNV
@@ -12,27 +12,27 @@ problem:
       - - - B
       - - - D
       - - - H
-      - - - T
+      - - - R
       - - - Q
     - name: SLNV
       projection:
       - - - B
       - - - D
       - - - H
-      - - - T
+      - - - R
       - - - Q
     - name: RNV
       projection:
       - - - B
       - - - D
       - - - H
-      - - - T
+      - - - R
       - - - Q
       read_write: true
     dimensions:
     - B
     - D
     - H
-    - T
+    - R
     - Q
     name: flashattn_rnv

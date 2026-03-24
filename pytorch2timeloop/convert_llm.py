@@ -241,7 +241,7 @@ class LLMAttentionVOp:
 
 @dataclass
 class FlashAttnQKOp:
-    """Tiled Q @ K^T: Q[B,D,H,Q] @ BK[B,D,H,T,N] -> QK[B,H,T,N,Q]."""
+    """Tiled Q @ K^T: Q[B,D,H,Q] @ BK[B,D,H,R,T] -> QK[B,H,R,T,Q]."""
     name: str
     batch: int
     num_heads: int
@@ -255,16 +255,16 @@ class FlashAttnQKOp:
             'problem': {
                 'shape': {
                     'name': self.name,
-                    'dimensions': ['B', 'D', 'H', 'T', 'N', 'Q'],
+                    'dimensions': ['B', 'D', 'H', 'R', 'T', 'Q'],
                     'data_spaces': [
                         {'name': 'Q', 'projection': [[['B']], [['D']], [['H']], [['Q']]]},
-                        {'name': 'BK', 'projection': [[['B']], [['D']], [['H']], [['T']], [['N']]]},
-                        {'name': 'QK', 'projection': [[['B']], [['H']], [['T']], [['N']], [['Q']]], 'read_write': True},
+                        {'name': 'BK', 'projection': [[['B']], [['D']], [['H']], [['R']], [['T']]]},
+                        {'name': 'QK', 'projection': [[['B']], [['H']], [['R']], [['T']], [['Q']]], 'read_write': True},
                     ],
                 },
                 'instance': {
                     'B': self.batch, 'D': self.head_dim, 'H': self.num_heads,
-                    'T': self.num_tiles, 'N': self.tile_size, 'Q': self.q_seq_len,
+                    'R': self.num_tiles, 'T': self.tile_size, 'Q': self.q_seq_len,
                 },
             },
         }
@@ -272,7 +272,7 @@ class FlashAttnQKOp:
 
 @dataclass
 class FlashAttnLMOp:
-    """Local max: QK[B,H,T,N,Q] -> LM[B,H,T,Q]. Reduce over N."""
+    """Local max: QK[B,H,R,T,Q] -> LM[B,H,R,Q]. Reduce over T."""
     name: str
     batch: int
     num_heads: int
@@ -285,15 +285,15 @@ class FlashAttnLMOp:
             'problem': {
                 'shape': {
                     'name': self.name,
-                    'dimensions': ['B', 'H', 'T', 'N', 'Q'],
+                    'dimensions': ['B', 'H', 'R', 'T', 'Q'],
                     'data_spaces': [
-                        {'name': 'QK', 'projection': [[['B']], [['H']], [['T']], [['N']], [['Q']]]},
-                        {'name': 'LM', 'projection': [[['B']], [['H']], [['T']], [['Q']]], 'read_write': True},
+                        {'name': 'QK', 'projection': [[['B']], [['H']], [['R']], [['T']], [['Q']]]},
+                        {'name': 'LM', 'projection': [[['B']], [['H']], [['R']], [['Q']]], 'read_write': True},
                     ],
                 },
                 'instance': {
                     'B': self.batch, 'H': self.num_heads,
-                    'T': self.num_tiles, 'N': self.tile_size, 'Q': self.q_seq_len,
+                    'R': self.num_tiles, 'T': self.tile_size, 'Q': self.q_seq_len,
                 },
             },
         }
@@ -301,7 +301,7 @@ class FlashAttnLMOp:
 
 @dataclass
 class FlashAttnRMOp:
-    """Running max: max(LM, RM0) -> RM. Elementwise [B,H,T,Q]."""
+    """Running max: max(LM, RM0) -> RM. Elementwise [B,H,R,Q]."""
     name: str
     batch: int
     num_heads: int
@@ -313,16 +313,16 @@ class FlashAttnRMOp:
             'problem': {
                 'shape': {
                     'name': self.name,
-                    'dimensions': ['B', 'H', 'T', 'Q'],
+                    'dimensions': ['B', 'H', 'R', 'Q'],
                     'data_spaces': [
-                        {'name': 'LM', 'projection': [[['B']], [['H']], [['T']], [['Q']]]},
-                        {'name': 'RM0', 'projection': [[['B']], [['H']], [['T']], [['Q']]]},
-                        {'name': 'RM', 'projection': [[['B']], [['H']], [['T']], [['Q']]], 'read_write': True},
+                        {'name': 'LM', 'projection': [[['B']], [['H']], [['R']], [['Q']]]},
+                        {'name': 'RM0', 'projection': [[['B']], [['H']], [['R']], [['Q']]]},
+                        {'name': 'RM', 'projection': [[['B']], [['H']], [['R']], [['Q']]], 'read_write': True},
                     ],
                 },
                 'instance': {
                     'B': self.batch, 'H': self.num_heads,
-                    'T': self.num_tiles, 'Q': self.q_seq_len,
+                    'R': self.num_tiles, 'Q': self.q_seq_len,
                 },
             },
         }
@@ -330,7 +330,7 @@ class FlashAttnRMOp:
 
 @dataclass
 class FlashAttnPRMOp:
-    """Prev running max rescale: exp(RM0 - RM) -> PRM. Elementwise [B,H,T,Q]."""
+    """Prev running max rescale: exp(RM0 - RM) -> PRM. Elementwise [B,H,R,Q]."""
     name: str
     batch: int
     num_heads: int
@@ -342,16 +342,16 @@ class FlashAttnPRMOp:
             'problem': {
                 'shape': {
                     'name': self.name,
-                    'dimensions': ['B', 'H', 'T', 'Q'],
+                    'dimensions': ['B', 'H', 'R', 'Q'],
                     'data_spaces': [
-                        {'name': 'RM0', 'projection': [[['B']], [['H']], [['T']], [['Q']]]},
-                        {'name': 'RM', 'projection': [[['B']], [['H']], [['T']], [['Q']]]},
-                        {'name': 'PRM', 'projection': [[['B']], [['H']], [['T']], [['Q']]], 'read_write': True},
+                        {'name': 'RM0', 'projection': [[['B']], [['H']], [['R']], [['Q']]]},
+                        {'name': 'RM', 'projection': [[['B']], [['H']], [['R']], [['Q']]]},
+                        {'name': 'PRM', 'projection': [[['B']], [['H']], [['R']], [['Q']]], 'read_write': True},
                     ],
                 },
                 'instance': {
                     'B': self.batch, 'H': self.num_heads,
-                    'T': self.num_tiles, 'Q': self.q_seq_len,
+                    'R': self.num_tiles, 'Q': self.q_seq_len,
                 },
             },
         }
@@ -359,7 +359,7 @@ class FlashAttnPRMOp:
 
 @dataclass
 class FlashAttnSLNOp:
-    """Local sub+exp: exp(QK - RM) -> SLN. Dims [B,H,T,N,Q]."""
+    """Local sub+exp: exp(QK - RM) -> SLN. Dims [B,H,R,T,Q]."""
     name: str
     batch: int
     num_heads: int
@@ -372,16 +372,16 @@ class FlashAttnSLNOp:
             'problem': {
                 'shape': {
                     'name': self.name,
-                    'dimensions': ['B', 'H', 'T', 'N', 'Q'],
+                    'dimensions': ['B', 'H', 'R', 'T', 'Q'],
                     'data_spaces': [
-                        {'name': 'QK', 'projection': [[['B']], [['H']], [['T']], [['N']], [['Q']]]},
-                        {'name': 'RM', 'projection': [[['B']], [['H']], [['T']], [['Q']]]},
-                        {'name': 'SLN', 'projection': [[['B']], [['H']], [['T']], [['N']], [['Q']]], 'read_write': True},
+                        {'name': 'QK', 'projection': [[['B']], [['H']], [['R']], [['T']], [['Q']]]},
+                        {'name': 'RM', 'projection': [[['B']], [['H']], [['R']], [['Q']]]},
+                        {'name': 'SLN', 'projection': [[['B']], [['H']], [['R']], [['T']], [['Q']]], 'read_write': True},
                     ],
                 },
                 'instance': {
                     'B': self.batch, 'H': self.num_heads,
-                    'T': self.num_tiles, 'N': self.tile_size, 'Q': self.q_seq_len,
+                    'R': self.num_tiles, 'T': self.tile_size, 'Q': self.q_seq_len,
                 },
             },
         }
@@ -389,7 +389,7 @@ class FlashAttnSLNOp:
 
 @dataclass
 class FlashAttnSLDOp:
-    """Local sum: SLN[B,H,T,N,Q] -> SLD[B,H,T,Q]. Reduce over N."""
+    """Local sum: SLN[B,H,R,T,Q] -> SLD[B,H,R,Q]. Reduce over T."""
     name: str
     batch: int
     num_heads: int
@@ -402,15 +402,15 @@ class FlashAttnSLDOp:
             'problem': {
                 'shape': {
                     'name': self.name,
-                    'dimensions': ['B', 'H', 'T', 'N', 'Q'],
+                    'dimensions': ['B', 'H', 'R', 'T', 'Q'],
                     'data_spaces': [
-                        {'name': 'SLN', 'projection': [[['B']], [['H']], [['T']], [['N']], [['Q']]]},
-                        {'name': 'SLD', 'projection': [[['B']], [['H']], [['T']], [['Q']]], 'read_write': True},
+                        {'name': 'SLN', 'projection': [[['B']], [['H']], [['R']], [['T']], [['Q']]]},
+                        {'name': 'SLD', 'projection': [[['B']], [['H']], [['R']], [['Q']]], 'read_write': True},
                     ],
                 },
                 'instance': {
                     'B': self.batch, 'H': self.num_heads,
-                    'T': self.num_tiles, 'N': self.tile_size, 'Q': self.q_seq_len,
+                    'R': self.num_tiles, 'T': self.tile_size, 'Q': self.q_seq_len,
                 },
             },
         }
@@ -418,7 +418,7 @@ class FlashAttnSLDOp:
 
 @dataclass
 class FlashAttnSPDOp:
-    """Rescale prev denom: PRM * RD0 -> SPD. Elementwise [B,H,T,Q]."""
+    """Rescale prev denom: PRM * RD0 -> SPD. Elementwise [B,H,R,Q]."""
     name: str
     batch: int
     num_heads: int
@@ -430,16 +430,16 @@ class FlashAttnSPDOp:
             'problem': {
                 'shape': {
                     'name': self.name,
-                    'dimensions': ['B', 'H', 'T', 'Q'],
+                    'dimensions': ['B', 'H', 'R', 'Q'],
                     'data_spaces': [
-                        {'name': 'PRM', 'projection': [[['B']], [['H']], [['T']], [['Q']]]},
-                        {'name': 'RD0', 'projection': [[['B']], [['H']], [['T']], [['Q']]]},
-                        {'name': 'SPD', 'projection': [[['B']], [['H']], [['T']], [['Q']]], 'read_write': True},
+                        {'name': 'PRM', 'projection': [[['B']], [['H']], [['R']], [['Q']]]},
+                        {'name': 'RD0', 'projection': [[['B']], [['H']], [['R']], [['Q']]]},
+                        {'name': 'SPD', 'projection': [[['B']], [['H']], [['R']], [['Q']]], 'read_write': True},
                     ],
                 },
                 'instance': {
                     'B': self.batch, 'H': self.num_heads,
-                    'T': self.num_tiles, 'Q': self.q_seq_len,
+                    'R': self.num_tiles, 'Q': self.q_seq_len,
                 },
             },
         }
@@ -447,7 +447,7 @@ class FlashAttnSPDOp:
 
 @dataclass
 class FlashAttnRDOp:
-    """Running denom: SPD + SLD -> RD. Elementwise [B,H,T,Q]."""
+    """Running denom: SPD + SLD -> RD. Elementwise [B,H,R,Q]."""
     name: str
     batch: int
     num_heads: int
@@ -459,16 +459,16 @@ class FlashAttnRDOp:
             'problem': {
                 'shape': {
                     'name': self.name,
-                    'dimensions': ['B', 'H', 'T', 'Q'],
+                    'dimensions': ['B', 'H', 'R', 'Q'],
                     'data_spaces': [
-                        {'name': 'SPD', 'projection': [[['B']], [['H']], [['T']], [['Q']]]},
-                        {'name': 'SLD', 'projection': [[['B']], [['H']], [['T']], [['Q']]]},
-                        {'name': 'RD', 'projection': [[['B']], [['H']], [['T']], [['Q']]], 'read_write': True},
+                        {'name': 'SPD', 'projection': [[['B']], [['H']], [['R']], [['Q']]]},
+                        {'name': 'SLD', 'projection': [[['B']], [['H']], [['R']], [['Q']]]},
+                        {'name': 'RD', 'projection': [[['B']], [['H']], [['R']], [['Q']]], 'read_write': True},
                     ],
                 },
                 'instance': {
                     'B': self.batch, 'H': self.num_heads,
-                    'T': self.num_tiles, 'Q': self.q_seq_len,
+                    'R': self.num_tiles, 'Q': self.q_seq_len,
                 },
             },
         }
@@ -476,7 +476,7 @@ class FlashAttnRDOp:
 
 @dataclass
 class FlashAttnSLNVOp:
-    """Local attn @ V: SLN[B,H,T,N,Q] @ BV[B,D,H,T,N] -> SLNV[B,D,H,Q]."""
+    """Local attn @ V: SLN[B,H,R,T,Q] @ BV[B,D,H,R,T] -> SLNV[B,D,H,Q]."""
     name: str
     batch: int
     num_heads: int
@@ -490,16 +490,16 @@ class FlashAttnSLNVOp:
             'problem': {
                 'shape': {
                     'name': self.name,
-                    'dimensions': ['B', 'D', 'H', 'T', 'N', 'Q'],
+                    'dimensions': ['B', 'D', 'H', 'R', 'T', 'Q'],
                     'data_spaces': [
-                        {'name': 'SLN', 'projection': [[['B']], [['H']], [['T']], [['N']], [['Q']]]},
-                        {'name': 'BV', 'projection': [[['B']], [['D']], [['H']], [['T']], [['N']]]},
+                        {'name': 'SLN', 'projection': [[['B']], [['H']], [['R']], [['T']], [['Q']]]},
+                        {'name': 'BV', 'projection': [[['B']], [['D']], [['H']], [['R']], [['T']]]},
                         {'name': 'SLNV', 'projection': [[['B']], [['D']], [['H']], [['Q']]], 'read_write': True},
                     ],
                 },
                 'instance': {
                     'B': self.batch, 'D': self.head_dim, 'H': self.num_heads,
-                    'T': self.num_tiles, 'N': self.tile_size, 'Q': self.q_seq_len,
+                    'R': self.num_tiles, 'T': self.tile_size, 'Q': self.q_seq_len,
                 },
             },
         }
@@ -507,7 +507,7 @@ class FlashAttnSLNVOp:
 
 @dataclass
 class FlashAttnSPNVOp:
-    """Rescale prev output: PRM * RNV0 -> SPNV. Elementwise [B,D,H,T,Q]."""
+    """Rescale prev output: PRM * RNV0 -> SPNV. Elementwise [B,D,H,R,Q]."""
     name: str
     batch: int
     num_heads: int
@@ -520,16 +520,16 @@ class FlashAttnSPNVOp:
             'problem': {
                 'shape': {
                     'name': self.name,
-                    'dimensions': ['B', 'D', 'H', 'T', 'Q'],
+                    'dimensions': ['B', 'D', 'H', 'R', 'Q'],
                     'data_spaces': [
-                        {'name': 'PRM', 'projection': [[['B']], [['H']], [['T']], [['Q']]]},
-                        {'name': 'RNV0', 'projection': [[['B']], [['D']], [['H']], [['T']], [['Q']]]},
-                        {'name': 'SPNV', 'projection': [[['B']], [['D']], [['H']], [['T']], [['Q']]], 'read_write': True},
+                        {'name': 'PRM', 'projection': [[['B']], [['H']], [['R']], [['Q']]]},
+                        {'name': 'RNV0', 'projection': [[['B']], [['D']], [['H']], [['R']], [['Q']]]},
+                        {'name': 'SPNV', 'projection': [[['B']], [['D']], [['H']], [['R']], [['Q']]], 'read_write': True},
                     ],
                 },
                 'instance': {
                     'B': self.batch, 'D': self.head_dim, 'H': self.num_heads,
-                    'T': self.num_tiles, 'Q': self.q_seq_len,
+                    'R': self.num_tiles, 'Q': self.q_seq_len,
                 },
             },
         }
@@ -537,7 +537,7 @@ class FlashAttnSPNVOp:
 
 @dataclass
 class FlashAttnRNVOp:
-    """Running output: SPNV + SLNV -> RNV. Elementwise [B,D,H,T,Q]."""
+    """Running output: SPNV + SLNV -> RNV. Elementwise [B,D,H,R,Q]."""
     name: str
     batch: int
     num_heads: int
@@ -550,16 +550,16 @@ class FlashAttnRNVOp:
             'problem': {
                 'shape': {
                     'name': self.name,
-                    'dimensions': ['B', 'D', 'H', 'T', 'Q'],
+                    'dimensions': ['B', 'D', 'H', 'R', 'Q'],
                     'data_spaces': [
-                        {'name': 'SPNV', 'projection': [[['B']], [['D']], [['H']], [['T']], [['Q']]]},
-                        {'name': 'SLNV', 'projection': [[['B']], [['D']], [['H']], [['T']], [['Q']]]},
-                        {'name': 'RNV', 'projection': [[['B']], [['D']], [['H']], [['T']], [['Q']]], 'read_write': True},
+                        {'name': 'SPNV', 'projection': [[['B']], [['D']], [['H']], [['R']], [['Q']]]},
+                        {'name': 'SLNV', 'projection': [[['B']], [['D']], [['H']], [['R']], [['Q']]]},
+                        {'name': 'RNV', 'projection': [[['B']], [['D']], [['H']], [['R']], [['Q']]], 'read_write': True},
                     ],
                 },
                 'instance': {
                     'B': self.batch, 'D': self.head_dim, 'H': self.num_heads,
-                    'T': self.num_tiles, 'Q': self.q_seq_len,
+                    'R': self.num_tiles, 'Q': self.q_seq_len,
                 },
             },
         }
@@ -949,7 +949,7 @@ def _generate_flashattn_operators(cfg: LLMConfig, batch_size: int,
     """
     Generate the 12 FlashAttention (online tiled softmax) operators.
 
-    K is split into T tiles of size N: K = T * N.
+    K is split into R tiles of size T: K = R * T.
     These implement the online softmax recurrence from FlashAttention / FuseMax.
 
     Args:
@@ -960,32 +960,32 @@ def _generate_flashattn_operators(cfg: LLMConfig, batch_size: int,
     D = cfg.head_dim
     Q = q_seq_len
     K = kv_seq_len
-    N = tile_size
-    T = (K + N - 1) // N  # ceil division
+    T = tile_size
+    R = (K + T - 1) // T  # ceil division
 
     return [
         FlashAttnQKOp(name='flashattn_qk', batch=B, num_heads=H,
-                       q_seq_len=Q, num_tiles=T, tile_size=N, head_dim=D),
+                       q_seq_len=Q, num_tiles=R, tile_size=T, head_dim=D),
         FlashAttnLMOp(name='flashattn_lm', batch=B, num_heads=H,
-                       q_seq_len=Q, num_tiles=T, tile_size=N),
+                       q_seq_len=Q, num_tiles=R, tile_size=T),
         FlashAttnRMOp(name='flashattn_rm', batch=B, num_heads=H,
-                       q_seq_len=Q, num_tiles=T),
+                       q_seq_len=Q, num_tiles=R),
         FlashAttnPRMOp(name='flashattn_prm', batch=B, num_heads=H,
-                        q_seq_len=Q, num_tiles=T),
+                        q_seq_len=Q, num_tiles=R),
         FlashAttnSLNOp(name='flashattn_sln', batch=B, num_heads=H,
-                        q_seq_len=Q, num_tiles=T, tile_size=N),
+                        q_seq_len=Q, num_tiles=R, tile_size=T),
         FlashAttnSLDOp(name='flashattn_sld', batch=B, num_heads=H,
-                        q_seq_len=Q, num_tiles=T, tile_size=N),
+                        q_seq_len=Q, num_tiles=R, tile_size=T),
         FlashAttnSPDOp(name='flashattn_spd', batch=B, num_heads=H,
-                        q_seq_len=Q, num_tiles=T),
+                        q_seq_len=Q, num_tiles=R),
         FlashAttnRDOp(name='flashattn_rd', batch=B, num_heads=H,
-                       q_seq_len=Q, num_tiles=T),
+                       q_seq_len=Q, num_tiles=R),
         FlashAttnSLNVOp(name='flashattn_slnv', batch=B, num_heads=H,
-                         q_seq_len=Q, num_tiles=T, tile_size=N, head_dim=D),
+                         q_seq_len=Q, num_tiles=R, tile_size=T, head_dim=D),
         FlashAttnSPNVOp(name='flashattn_spnv', batch=B, num_heads=H,
-                         q_seq_len=Q, num_tiles=T, head_dim=D),
+                         q_seq_len=Q, num_tiles=R, head_dim=D),
         FlashAttnRNVOp(name='flashattn_rnv', batch=B, num_heads=H,
-                        q_seq_len=Q, num_tiles=T, head_dim=D),
+                        q_seq_len=Q, num_tiles=R, head_dim=D),
         FlashAttnAVOp(name='flashattn_av', batch=B, num_heads=H,
                        q_seq_len=Q, head_dim=D),
     ]
@@ -1269,15 +1269,19 @@ def convert_llm(config_path: str, save_dir: str,
             yaml.dump(op.to_yaml(), f, default_flow_style=False)
 
     # Write dimensions summary for FlashAttention
-    M = kv_cache_len if kv_cache_len is not None else seq_len
+    K = kv_cache_len if kv_cache_len is not None else seq_len
     Q_len = seq_len if phase == 'prefill' else 1
+    tile_sz = 256  # default tile size, matching _generate_flashattn_operators
+    R_val = (K + tile_sz - 1) // tile_sz
     dims = {
         'dimensions': {
             'B': {'value': batch_size, 'description': 'Batch size'},
             'D': {'value': cfg.head_dim, 'description': 'Head dimension (Q/K/V)'},
             'H': {'value': cfg.num_attention_heads, 'description': 'Number of attention heads'},
-            'M': {'value': M, 'description': 'KV sequence length'},
+            'K': {'value': K, 'description': 'KV sequence length (K = R * T)'},
             'Q': {'value': Q_len, 'description': 'Query sequence length'},
+            'R': {'value': R_val, 'description': 'Number of KV tiles (rounds)'},
+            'T': {'value': tile_sz, 'description': 'KV tile size'},
         },
     }
     with open(os.path.join(flashattn_dir, 'dimensions.yaml'), 'w') as f:

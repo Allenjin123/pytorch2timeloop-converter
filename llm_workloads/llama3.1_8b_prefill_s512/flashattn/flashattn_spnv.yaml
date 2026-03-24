@@ -4,34 +4,34 @@ problem:
     D: 128
     H: 32
     Q: 512
-    T: 2
+    R: 2
   shape:
     data_spaces:
     - name: PRM
       projection:
       - - - B
       - - - H
-      - - - T
+      - - - R
       - - - Q
     - name: RNV0
       projection:
       - - - B
       - - - D
       - - - H
-      - - - T
+      - - - R
       - - - Q
     - name: SPNV
       projection:
       - - - B
       - - - D
       - - - H
-      - - - T
+      - - - R
       - - - Q
       read_write: true
     dimensions:
     - B
     - D
     - H
-    - T
+    - R
     - Q
     name: flashattn_spnv
