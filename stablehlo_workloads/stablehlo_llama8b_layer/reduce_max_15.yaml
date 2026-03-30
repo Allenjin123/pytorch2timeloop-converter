@@ -1,0 +1,26 @@
+problem:
+  shape:
+    name: reduce_max_15
+    dimensions:
+    - D0
+    - D1
+    - D2
+    - D3
+    data_spaces:
+    - name: Inputs
+      projection:
+      - - - D0
+      - - - D1
+      - - - D2
+      - - - D3
+    - name: Outputs
+      projection:
+      - - - D0
+      - - - D1
+      - - - D2
+      read_write: true
+  instance:
+    D0: 1
+    D1: 32
+    D2: 2048
+    D3: 2048

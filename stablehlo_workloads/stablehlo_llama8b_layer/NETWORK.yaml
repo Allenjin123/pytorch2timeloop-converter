@@ -1,0 +1,64 @@
+network:
+  model_name: stablehlo_llama8b_layer
+  frontend: StableHLO
+  total_operators: 11
+  unique_operators: 7
+  inputs:
+  - name: arg0
+    shape:
+    - 1
+    - 2048
+    - 4096
+    dtype: f32
+structure:
+  unique_yamls:
+  - dot_general_7
+  - dot_general_8
+  - dot_general_13
+  - reduce_max_15
+  - dot_general_25
+  - dot_general_29
+  - dot_general_32
+  operator_sequence:
+  - name: dot_general_7
+    type: dot_general
+    description: 'MatMul: batch={}, (2048 x 4096) @ (4096 x 4096)'
+  - name: dot_general_8
+    type: dot_general
+    description: 'MatMul: batch={}, (2048 x 4096) @ (4096 x 512)'
+  - name: dot_general_9
+    type: dot_general
+    description: 'MatMul: batch={}, (2048 x 4096) @ (4096 x 512)'
+  - name: dot_general_13
+    type: dot_general
+    description: 'MatMul: batch={''B'': 1, ''H'': 32}, (2048 x 128) @ (128 x 2048)'
+  - name: reduce_max_15
+    type: reduce_max
+    description: Reduce(max) over dims [3] of shape [1, 32, 2048, 2048]
+  - name: reduce_max_21
+    type: reduce_max
+    description: Reduce(max) over dims [3] of shape [1, 32, 2048, 2048]
+  - name: dot_general_25
+    type: dot_general
+    description: 'MatMul: batch={''B'': 1, ''H'': 32}, (2048 x 2048) @ (2048 x 128)'
+  - name: dot_general_27
+    type: dot_general
+    description: 'MatMul: batch={}, (2048 x 4096) @ (4096 x 4096)'
+  - name: dot_general_29
+    type: dot_general
+    description: 'MatMul: batch={}, (2048 x 4096) @ (4096 x 14336)'
+  - name: dot_general_30
+    type: dot_general
+    description: 'MatMul: batch={}, (2048 x 4096) @ (4096 x 14336)'
+  - name: dot_general_32
+    type: dot_general
+    description: 'MatMul: batch={}, (2048 x 14336) @ (14336 x 4096)'
+  aliases:
+    dot_general_8:
+    - dot_general_9
+    reduce_max_15:
+    - reduce_max_21
+    dot_general_7:
+    - dot_general_27
+    dot_general_29:
+    - dot_general_30

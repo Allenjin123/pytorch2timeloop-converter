@@ -1,0 +1,25 @@
+problem:
+  shape:
+    name: dot_general_32
+    dimensions:
+    - N
+    - C
+    - M
+    data_spaces:
+    - name: Inputs1
+      projection:
+      - - - C
+      - - - M
+    - name: Inputs2
+      projection:
+      - - - N
+      - - - C
+    - name: Outputs
+      projection:
+      - - - N
+      - - - M
+      read_write: true
+  instance:
+    N: 2048
+    C: 14336
+    M: 4096

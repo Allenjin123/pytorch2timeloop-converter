@@ -1,0 +1,37 @@
+problem:
+  shape:
+    name: dot_general_13
+    dimensions:
+    - B
+    - H
+    - N
+    - C
+    - M
+    data_spaces:
+    - name: Inputs1
+      projection:
+      - &id001
+        - - B
+      - &id002
+        - - H
+      - - - C
+      - - - M
+    - name: Inputs2
+      projection:
+      - *id001
+      - *id002
+      - - - N
+      - - - C
+    - name: Outputs
+      projection:
+      - *id001
+      - *id002
+      - - - N
+      - - - M
+      read_write: true
+  instance:
+    B: 1
+    H: 32
+    N: 2048
+    C: 128
+    M: 2048

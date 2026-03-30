@@ -1,0 +1,32 @@
+network:
+  model_name: stablehlo_cnn_block
+  frontend: StableHLO
+  total_operators: 4
+  unique_operators: 4
+  inputs:
+  - name: arg0
+    shape:
+    - 1
+    - 3
+    - 224
+    - 224
+    dtype: f32
+structure:
+  unique_yamls:
+  - conv_1
+  - conv_3
+  - conv_5
+  - conv_7
+  operator_sequence:
+  - name: conv_1
+    type: convolution
+    description: 'Conv: N=1, G=1, C=3, M=64, kernel=[7, 7], out=[112, 112]'
+  - name: conv_3
+    type: convolution
+    description: 'Conv: N=1, G=1, C=64, M=128, kernel=[3, 3], out=[56, 56]'
+  - name: conv_5
+    type: convolution
+    description: 'Conv: N=1, G=1, C=128, M=256, kernel=[3, 3], out=[28, 28]'
+  - name: conv_7
+    type: convolution
+    description: 'Conv: N=1, G=256, C=1, M=1, kernel=[3, 3], out=[14, 14]'

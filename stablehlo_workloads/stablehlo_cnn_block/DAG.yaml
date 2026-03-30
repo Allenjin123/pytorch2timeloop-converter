@@ -1,0 +1,100 @@
+dag:
+  model_name: stablehlo_cnn_block
+  num_nodes: 5
+  num_edges: 4
+  topological_order:
+  - input_arg0
+  - conv_1
+  - conv_3
+  - conv_5
+  - conv_7
+  parallel_levels:
+  - level: 0
+    nodes:
+    - input_arg0
+  - level: 1
+    nodes:
+    - conv_1
+  - level: 2
+    nodes:
+    - conv_3
+  - level: 3
+    nodes:
+    - conv_5
+  - level: 4
+    nodes:
+    - conv_7
+  nodes:
+  - id: input_arg0
+    op_type: placeholder
+    yaml_file: ''
+    tensor_dims:
+      D0: 1
+      D1: 3
+      D2: 224
+      D3: 224
+  - id: conv_1
+    op_type: conv2d
+    yaml_file: conv_1.yaml
+    tensor_dims:
+      N: 1
+      G: 1
+      C: 3
+      M: 64
+  - id: conv_3
+    op_type: conv2d
+    yaml_file: conv_3.yaml
+    tensor_dims:
+      N: 1
+      G: 1
+      C: 64
+      M: 128
+  - id: conv_5
+    op_type: conv2d
+    yaml_file: conv_5.yaml
+    tensor_dims:
+      N: 1
+      G: 1
+      C: 128
+      M: 256
+  - id: conv_7
+    op_type: conv2d
+    yaml_file: conv_7.yaml
+    tensor_dims:
+      N: 1
+      G: 256
+      C: 1
+      M: 1
+  edges:
+  - src: input_arg0
+    dst: conv_1
+    tensor_name: varg0
+    tensor_shape:
+    - 1
+    - 3
+    - 224
+    - 224
+  - src: conv_1
+    dst: conv_3
+    tensor_name: vconv1
+    tensor_shape:
+    - 1
+    - 64
+    - 112
+    - 112
+  - src: conv_3
+    dst: conv_5
+    tensor_name: vconv2
+    tensor_shape:
+    - 1
+    - 128
+    - 56
+    - 56
+  - src: conv_5
+    dst: conv_7
+    tensor_name: vconv3
+    tensor_shape:
+    - 1
+    - 256
+    - 28
+    - 28

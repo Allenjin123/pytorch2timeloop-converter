@@ -1,0 +1,55 @@
+dag:
+  model_name: stablehlo_mlp
+  num_nodes: 3
+  num_edges: 2
+  topological_order:
+  - input_arg0
+  - dot_general_2
+  - dot_general_3
+  parallel_levels:
+  - level: 0
+    nodes:
+    - input_arg0
+  - level: 1
+    nodes:
+    - dot_general_2
+  - level: 2
+    nodes:
+    - dot_general_3
+  nodes:
+  - id: input_arg0
+    op_type: placeholder
+    yaml_file: ''
+    tensor_dims:
+      D0: 1
+      D1: 2048
+      D2: 4096
+  - id: dot_general_2
+    op_type: linear
+    yaml_file: dot_general_2.yaml
+    tensor_dims:
+      N: 2048
+      C: 4096
+      M: 14336
+  - id: dot_general_3
+    op_type: linear
+    yaml_file: dot_general_3.yaml
+    tensor_dims:
+      N: 2048
+      C: 14336
+      M: 4096
+  edges:
+  - src: input_arg0
+    dst: dot_general_2
+    tensor_name: varg0
+    tensor_shape:
+    - 1
+    - 2048
+    - 4096
+  - src: dot_general_2
+    dst: dot_general_3
+    tensor_name: vhidden
+    tensor_shape:
+    - 1
+    - 2048
+    - 14336

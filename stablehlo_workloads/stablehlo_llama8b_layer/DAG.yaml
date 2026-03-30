@@ -1,0 +1,206 @@
+dag:
+  model_name: stablehlo_llama8b_layer
+  num_nodes: 12
+  num_edges: 13
+  topological_order:
+  - input_arg0
+  - dot_general_29
+  - dot_general_30
+  - dot_general_32
+  - dot_general_7
+  - dot_general_8
+  - dot_general_13
+  - dot_general_9
+  - dot_general_25
+  - dot_general_27
+  - reduce_max_15
+  - reduce_max_21
+  parallel_levels:
+  - level: 0
+    nodes:
+    - input_arg0
+  - level: 1
+    nodes:
+    - dot_general_29
+    - dot_general_30
+    - dot_general_7
+    - dot_general_8
+    - dot_general_9
+  - level: 2
+    nodes:
+    - dot_general_13
+    - dot_general_32
+  - level: 3
+    nodes:
+    - dot_general_25
+    - reduce_max_15
+    - reduce_max_21
+  - level: 4
+    nodes:
+    - dot_general_27
+  nodes:
+  - id: input_arg0
+    op_type: placeholder
+    yaml_file: ''
+    tensor_dims:
+      D0: 1
+      D1: 2048
+      D2: 4096
+  - id: dot_general_29
+    op_type: linear
+    yaml_file: dot_general_29.yaml
+    tensor_dims:
+      N: 2048
+      C: 4096
+      M: 14336
+  - id: dot_general_30
+    op_type: linear
+    yaml_file: dot_general_30.yaml
+    tensor_dims:
+      N: 2048
+      C: 4096
+      M: 14336
+  - id: dot_general_32
+    op_type: linear
+    yaml_file: dot_general_32.yaml
+    tensor_dims:
+      N: 2048
+      C: 14336
+      M: 4096
+  - id: dot_general_7
+    op_type: linear
+    yaml_file: dot_general_7.yaml
+    tensor_dims:
+      N: 2048
+      C: 4096
+      M: 4096
+  - id: dot_general_8
+    op_type: linear
+    yaml_file: dot_general_8.yaml
+    tensor_dims:
+      N: 2048
+      C: 4096
+      M: 512
+  - id: dot_general_13
+    op_type: linear
+    yaml_file: dot_general_13.yaml
+    tensor_dims:
+      B: 1
+      H: 32
+      N: 2048
+      C: 128
+      M: 2048
+  - id: dot_general_9
+    op_type: linear
+    yaml_file: dot_general_9.yaml
+    tensor_dims:
+      N: 2048
+      C: 4096
+      M: 512
+  - id: dot_general_25
+    op_type: linear
+    yaml_file: dot_general_25.yaml
+    tensor_dims:
+      B: 1
+      H: 32
+      N: 2048
+      C: 2048
+      M: 128
+  - id: dot_general_27
+    op_type: linear
+    yaml_file: dot_general_27.yaml
+    tensor_dims:
+      N: 2048
+      C: 4096
+      M: 4096
+  - id: reduce_max_15
+    op_type: reduce_max
+    yaml_file: reduce_max_15.yaml
+    tensor_dims:
+      D0: 1
+      D1: 32
+      D2: 2048
+      D3: 2048
+  - id: reduce_max_21
+    op_type: reduce_max
+    yaml_file: reduce_max_21.yaml
+    tensor_dims:
+      D0: 1
+      D1: 32
+      D2: 2048
+      D3: 2048
+  edges:
+  - src: input_arg0
+    dst: dot_general_7
+    tensor_name: varg0
+    tensor_shape: &id001
+    - 1
+    - 2048
+    - 4096
+  - src: input_arg0
+    dst: dot_general_8
+    tensor_name: varg0
+    tensor_shape: *id001
+  - src: input_arg0
+    dst: dot_general_9
+    tensor_name: varg0
+    tensor_shape: *id001
+  - src: dot_general_7
+    dst: dot_general_13
+    tensor_name: vq_reshaped
+    tensor_shape:
+    - 1
+    - 32
+    - 2048
+    - 128
+  - src: dot_general_8
+    dst: dot_general_13
+    tensor_name: vk_reshaped
+    tensor_shape:
+    - 1
+    - 32
+    - 2048
+    - 128
+  - src: dot_general_13
+    dst: reduce_max_15
+    tensor_name: vscores
+    tensor_shape:
+    - 1
+    - 32
+    - 2048
+    - 2048
+  - src: dot_general_13
+    dst: reduce_max_21
+    tensor_name: vexp_scores
+    tensor_shape: []
+  - src: dot_general_13
+    dst: dot_general_25
+    tensor_name: vattn_weights
+    tensor_shape: []
+  - src: dot_general_9
+    dst: dot_general_25
+    tensor_name: vv_reshaped
+    tensor_shape:
+    - 1
+    - 32
+    - 2048
+    - 128
+  - src: dot_general_25
+    dst: dot_general_27
+    tensor_name: vcontext_flat
+    tensor_shape:
+    - 1
+    - 2048
+    - 4096
+  - src: input_arg0
+    dst: dot_general_29
+    tensor_name: vattn_out
+    tensor_shape: []
+  - src: input_arg0
+    dst: dot_general_30
+    tensor_name: vattn_out
+    tensor_shape: []
+  - src: dot_general_29
+    dst: dot_general_32
+    tensor_name: vmlp_mid
+    tensor_shape: []

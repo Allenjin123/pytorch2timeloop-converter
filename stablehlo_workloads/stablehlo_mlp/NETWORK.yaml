@@ -1,0 +1,23 @@
+network:
+  model_name: stablehlo_mlp
+  frontend: StableHLO
+  total_operators: 2
+  unique_operators: 2
+  inputs:
+  - name: arg0
+    shape:
+    - 1
+    - 2048
+    - 4096
+    dtype: f32
+structure:
+  unique_yamls:
+  - dot_general_2
+  - dot_general_3
+  operator_sequence:
+  - name: dot_general_2
+    type: dot_general
+    description: 'MatMul: batch={}, (2048 x 4096) @ (4096 x 14336)'
+  - name: dot_general_3
+    type: dot_general
+    description: 'MatMul: batch={}, (2048 x 14336) @ (14336 x 4096)'
