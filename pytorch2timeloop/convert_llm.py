@@ -1161,7 +1161,8 @@ def convert_llm(config_path: str, save_dir: str,
                 model_name: str = None,
                 batch_size: int = 1, seq_len: int = 128,
                 phase: str = 'prefill',
-                kv_cache_len: Optional[int] = None):
+                kv_cache_len: Optional[int] = None,
+                output_name: Optional[str] = None):
     """
     Convert a decoder-only transformer LLM config to Timeloop workload YAMLs.
 
@@ -1209,7 +1210,15 @@ def convert_llm(config_path: str, save_dir: str,
     attn_ops = _generate_attention_operators(cfg, 0, batch_size, seq_len, kv_cache_len)
 
     # Deduplicate: remove v_proj (same dims as k_proj)
-    unique_attn = [op for op in attn_ops if 'v_proj' not in op.name]
+    # ViT (standard MHA): q/k/v/o proj all have same dims, keep only q_proj
+    is_vit = output_name is not None and 'vit' in output_name
+    if is_vit:
+        unique_attn = [op for op in attn_ops
+                       if 'v_proj' not in op.name
+                       and 'k_proj' not in op.name
+                       and 'o_proj' not in op.name]
+    else:
+        unique_attn = [op for op in attn_ops if 'v_proj' not in op.name]
 
     # MLP ops
     if cfg.is_moe:
@@ -1238,11 +1247,12 @@ def convert_llm(config_path: str, save_dir: str,
     unique_ops = unique_attn + unique_mlp + [lm_head_op]
 
     # Include phase and dimensions in output directory name
-    if phase == 'prefill':
-        phase_suffix = f"prefill_s{seq_len}"
+    if output_name is not None:
+        outdir = os.path.join(save_dir, output_name)
+    elif phase == 'prefill':
+        outdir = os.path.join(save_dir, f"{cfg.model_name}_prefill_s{seq_len}")
     else:
-        phase_suffix = f"decode_kv{kv_cache_len}"
-    outdir = os.path.join(save_dir, f"{cfg.model_name}_{phase_suffix}")
+        outdir = os.path.join(save_dir, f"{cfg.model_name}_decode_kv{kv_cache_len}")
     os.makedirs(outdir, exist_ok=True)
 
     # Write only unique operator YAMLs

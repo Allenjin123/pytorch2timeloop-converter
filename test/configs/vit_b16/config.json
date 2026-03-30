@@ -1,0 +1,12 @@
+{
+  "architectures": ["ViTForImageClassification"],
+  "model_type": "vit",
+  "hidden_size": 768,
+  "num_attention_heads": 12,
+  "num_key_value_heads": 12,
+  "intermediate_size": 3072,
+  "num_hidden_layers": 12,
+  "vocab_size": 1000,
+  "image_size": 224,
+  "patch_size": 16
+}
