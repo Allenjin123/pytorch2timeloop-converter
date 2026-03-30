@@ -1,12 +1,16 @@
 dag:
   model_name: llama3.1_8b
-  num_nodes: 13
-  num_edges: 17
+  num_nodes: 17
+  num_edges: 21
   topological_order:
   - layer0_input
   - layer0_k_proj
   - layer0_q_proj
   - layer0_attn_qk
+  - layer0_softmax_max
+  - layer0_softmax_exp
+  - layer0_softmax_sum
+  - layer0_softmax_div
   - layer0_v_proj
   - layer0_attn_v
   - layer0_o_proj
@@ -30,24 +34,36 @@ dag:
     - layer0_attn_qk
   - level: 3
     nodes:
-    - layer0_attn_v
+    - layer0_softmax_max
   - level: 4
     nodes:
-    - layer0_o_proj
+    - layer0_softmax_exp
   - level: 5
     nodes:
-    - layer0_attn_residual_add
+    - layer0_softmax_sum
   - level: 6
+    nodes:
+    - layer0_softmax_div
+  - level: 7
+    nodes:
+    - layer0_attn_v
+  - level: 8
+    nodes:
+    - layer0_o_proj
+  - level: 9
+    nodes:
+    - layer0_attn_residual_add
+  - level: 10
     nodes:
     - layer0_gate_proj
     - layer0_up_proj
-  - level: 7
+  - level: 11
     nodes:
     - layer0_down_proj
-  - level: 8
+  - level: 12
     nodes:
     - layer0_mlp_residual_add
-  - level: 9
+  - level: 13
     nodes:
     - lm_head
   nodes:
@@ -83,6 +99,26 @@ dag:
       Q: 2048
       K: 2048
       D: 128
+  - id: layer0_softmax_max
+    op_type: softmax_max
+    yaml_file: layer0_softmax_max.yaml
+    tensor_dims: &id001
+      B: 1
+      H: 32
+      Q: 2048
+      K: 2048
+  - id: layer0_softmax_exp
+    op_type: softmax_exp
+    yaml_file: layer0_softmax_exp.yaml
+    tensor_dims: *id001
+  - id: layer0_softmax_sum
+    op_type: softmax_sum
+    yaml_file: layer0_softmax_sum.yaml
+    tensor_dims: *id001
+  - id: layer0_softmax_div
+    op_type: softmax_div
+    yaml_file: layer0_softmax_div.yaml
+    tensor_dims: *id001
   - id: layer0_v_proj
     op_type: linear
     yaml_file: layer0_k_proj.yaml
@@ -158,18 +194,18 @@ dag:
   - src: layer0_input
     dst: layer0_q_proj
     tensor_name: hidden_states
-    tensor_shape: &id001
+    tensor_shape: &id002
     - 1
     - 2048
     - 4096
   - src: layer0_input
     dst: layer0_k_proj
     tensor_name: hidden_states
-    tensor_shape: *id001
+    tensor_shape: *id002
   - src: layer0_input
     dst: layer0_v_proj
     tensor_name: hidden_states
-    tensor_shape: *id001
+    tensor_shape: *id002
   - src: layer0_q_proj
     dst: layer0_attn_qk
     tensor_name: query
@@ -187,13 +223,29 @@ dag:
     - 2048
     - 128
   - src: layer0_attn_qk
-    dst: layer0_attn_v
+    dst: layer0_softmax_max
     tensor_name: scores
-    tensor_shape:
+    tensor_shape: &id003
     - 1
     - 32
     - 2048
     - 2048
+  - src: layer0_softmax_max
+    dst: layer0_softmax_exp
+    tensor_name: scores_max
+    tensor_shape: *id003
+  - src: layer0_softmax_exp
+    dst: layer0_softmax_sum
+    tensor_name: scores_exp
+    tensor_shape: *id003
+  - src: layer0_softmax_sum
+    dst: layer0_softmax_div
+    tensor_name: scores_sum
+    tensor_shape: *id003
+  - src: layer0_softmax_div
+    dst: layer0_attn_v
+    tensor_name: attn_weights
+    tensor_shape: *id003
   - src: layer0_v_proj
     dst: layer0_attn_v
     tensor_name: value
@@ -212,19 +264,19 @@ dag:
   - src: layer0_o_proj
     dst: layer0_attn_residual_add
     tensor_name: o_proj_output
-    tensor_shape: *id001
+    tensor_shape: *id002
   - src: layer0_input
     dst: layer0_attn_residual_add
     tensor_name: residual
-    tensor_shape: *id001
+    tensor_shape: *id002
   - src: layer0_attn_residual_add
     dst: layer0_gate_proj
     tensor_name: post_attn
-    tensor_shape: *id001
+    tensor_shape: *id002
   - src: layer0_attn_residual_add
     dst: layer0_up_proj
     tensor_name: post_attn
-    tensor_shape: *id001
+    tensor_shape: *id002
   - src: layer0_gate_proj
     dst: layer0_down_proj
     tensor_name: gate_output
@@ -242,11 +294,11 @@ dag:
   - src: layer0_down_proj
     dst: layer0_mlp_residual_add
     tensor_name: down_proj_output
-    tensor_shape: *id001
+    tensor_shape: *id002
   - src: layer0_attn_residual_add
     dst: layer0_mlp_residual_add
     tensor_name: residual
-    tensor_shape: *id001
+    tensor_shape: *id002
   - src: layer0_mlp_residual_add
     dst: lm_head
     tensor_name: final_hidden

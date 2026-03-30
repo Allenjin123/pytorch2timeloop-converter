@@ -259,12 +259,28 @@ def build_llm_decoder_layer_dag(
     dag.add_edge(q_id, qk_id, 'query', [B, n_h, Sq, d])
     dag.add_edge(k_id, qk_id, 'key', [B, n_h, Sk, d])
 
+    # --- Softmax (4-step decomposition: max → exp → sum → div) ---
+    scores_shape = [B, n_h, Sq, Sk]
+    sm_max_id  = f"{L}_softmax_max"
+    sm_exp_id  = f"{L}_softmax_exp"
+    sm_sum_id  = f"{L}_softmax_sum"
+    sm_div_id  = f"{L}_softmax_div"
+    sm_dims = {'B': B, 'H': n_h, 'Q': Sq, 'K': Sk}
+    dag.add_node(DAGNode(sm_max_id, 'softmax_max', f"{L}_softmax_max.yaml", sm_dims))
+    dag.add_node(DAGNode(sm_exp_id, 'softmax_exp', f"{L}_softmax_exp.yaml", sm_dims))
+    dag.add_node(DAGNode(sm_sum_id, 'softmax_sum', f"{L}_softmax_sum.yaml", sm_dims))
+    dag.add_node(DAGNode(sm_div_id, 'softmax_div', f"{L}_softmax_div.yaml", sm_dims))
+    dag.add_edge(qk_id,    sm_max_id, 'scores',      scores_shape)
+    dag.add_edge(sm_max_id, sm_exp_id, 'scores_max',  scores_shape)
+    dag.add_edge(sm_exp_id, sm_sum_id, 'scores_exp',  scores_shape)
+    dag.add_edge(sm_sum_id, sm_div_id, 'scores_sum',  scores_shape)
+
     # --- Attention V ---
     av_id = f"{L}_attn_v"
     dag.add_node(DAGNode(av_id, 'attn_v', f"{L}_attn_v.yaml",
                          {'B': B, 'H': n_h, 'Q': Sq, 'K': Sk, 'D': d}))
-    dag.add_edge(qk_id, av_id, 'scores', [B, n_h, Sq, Sk])
-    dag.add_edge(v_id, av_id, 'value', [B, n_h, Sk, d])
+    dag.add_edge(sm_div_id, av_id, 'attn_weights', scores_shape)
+    dag.add_edge(v_id,      av_id, 'value',         [B, n_h, Sk, d])
 
     # --- O projection ---
     o_id = f"{L}_o_proj"
@@ -362,11 +378,27 @@ def build_llm_moe_decoder_layer_dag(
     dag.add_edge(q_id, qk_id, 'query', [B, n_h, Sq, d])
     dag.add_edge(k_id, qk_id, 'key', [B, n_h, Sk, d])
 
+    # --- Softmax (4-step decomposition: max → exp → sum → div) ---
+    scores_shape = [B, n_h, Sq, Sk]
+    sm_max_id  = f"{L}_softmax_max"
+    sm_exp_id  = f"{L}_softmax_exp"
+    sm_sum_id  = f"{L}_softmax_sum"
+    sm_div_id  = f"{L}_softmax_div"
+    sm_dims = {'B': B, 'H': n_h, 'Q': Sq, 'K': Sk}
+    dag.add_node(DAGNode(sm_max_id, 'softmax_max', f"softmax_max.yaml", sm_dims))
+    dag.add_node(DAGNode(sm_exp_id, 'softmax_exp', f"softmax_exp.yaml", sm_dims))
+    dag.add_node(DAGNode(sm_sum_id, 'softmax_sum', f"softmax_sum.yaml", sm_dims))
+    dag.add_node(DAGNode(sm_div_id, 'softmax_div', f"softmax_div.yaml", sm_dims))
+    dag.add_edge(qk_id,    sm_max_id, 'scores',      scores_shape)
+    dag.add_edge(sm_max_id, sm_exp_id, 'scores_max',  scores_shape)
+    dag.add_edge(sm_exp_id, sm_sum_id, 'scores_exp',  scores_shape)
+    dag.add_edge(sm_sum_id, sm_div_id, 'scores_sum',  scores_shape)
+
     av_id = f"{L}_attn_v"
     dag.add_node(DAGNode(av_id, 'attn_v', f"attn_v.yaml",
                          {'B': B, 'H': n_h, 'Q': Sq, 'K': Sk, 'D': d}))
-    dag.add_edge(qk_id, av_id, 'scores', [B, n_h, Sq, Sk])
-    dag.add_edge(v_id, av_id, 'value', [B, n_h, Sk, d])
+    dag.add_edge(sm_div_id, av_id, 'attn_weights', scores_shape)
+    dag.add_edge(v_id,      av_id, 'value',         [B, n_h, Sk, d])
 
     o_id = f"{L}_o_proj"
     dag.add_node(DAGNode(o_id, 'linear', f"o_proj.yaml",

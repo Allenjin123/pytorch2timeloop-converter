@@ -35,6 +35,10 @@ OP_COLORS = {
     'pointwise_conv2d': '#7BC67B',  # light green
     'depthwise_conv2d': '#2D8A4E',  # dark green
     'attn_qk':          '#E8963E',  # orange
+    'softmax_max':      '#F5C842',  # yellow-orange
+    'softmax_exp':      '#F0B429',  # amber
+    'softmax_sum':      '#E8963E',  # orange (same family)
+    'softmax_div':      '#D4832C',  # dark amber
     'attn_v':           '#D4722C',  # dark orange
     'residual_add':     '#E85454',  # red
     'elementwise_add':  '#E87070',  # light red
@@ -52,6 +56,10 @@ OP_SHAPES = {
     'pointwise_conv2d': 'box',
     'depthwise_conv2d': 'box',
     'attn_qk':          'diamond',
+    'softmax_max':      'parallelogram',
+    'softmax_exp':      'parallelogram',
+    'softmax_sum':      'parallelogram',
+    'softmax_div':      'parallelogram',
     'attn_v':           'diamond',
     'residual_add':     'circle',
     'elementwise_add':  'circle',
@@ -83,7 +91,8 @@ def _short_label(node_id: str, op_type: str, tensor_dims: dict,
             c = tensor_dims.get('C', '?')
             m = tensor_dims.get('M', '?')
             label += f"\\n{c}->{m} {r}x{s}"
-    elif op_type in ('attn_qk', 'attn_v'):
+    elif op_type in ('attn_qk', 'attn_v',
+                     'softmax_max', 'softmax_exp', 'softmax_sum', 'softmax_div'):
         if 'Q' in tensor_dims and 'K' in tensor_dims:
             label += f"\\n{tensor_dims['Q']}x{tensor_dims['K']}"
     elif op_type == 'residual_add':
@@ -254,8 +263,8 @@ def dag_to_dot(dag_data: dict, compact: bool = False,
     legend_ops = []
     seen_types = {n.get('op_type') for n in d['nodes']}
     for op in ['linear', 'conv2d', 'pointwise_conv2d', 'depthwise_conv2d',
-               'attn_qk', 'attn_v', 'residual_add', 'elementwise_mul',
-               'moe_combine']:
+               'attn_qk', 'softmax_max', 'softmax_exp', 'softmax_sum', 'softmax_div',
+               'attn_v', 'residual_add', 'elementwise_mul', 'moe_combine']:
         if op in seen_types:
             legend_ops.append(op)
 

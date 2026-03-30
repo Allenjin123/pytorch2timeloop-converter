@@ -1,12 +1,16 @@
 dag:
   model_name: qwen3_30b_a3b
-  num_nodes: 396
-  num_edges: 654
+  num_nodes: 400
+  num_edges: 658
   topological_order:
   - layer0_input
   - layer0_k_proj
   - layer0_q_proj
   - layer0_attn_qk
+  - layer0_softmax_max
+  - layer0_softmax_exp
+  - layer0_softmax_sum
+  - layer0_softmax_div
   - layer0_v_proj
   - layer0_attn_v
   - layer0_o_proj
@@ -413,17 +417,29 @@ dag:
     - layer0_attn_qk
   - level: 3
     nodes:
-    - layer0_attn_v
+    - layer0_softmax_max
   - level: 4
     nodes:
-    - layer0_o_proj
+    - layer0_softmax_exp
   - level: 5
     nodes:
-    - layer0_attn_residual_add
+    - layer0_softmax_sum
   - level: 6
     nodes:
-    - layer0_router
+    - layer0_softmax_div
   - level: 7
+    nodes:
+    - layer0_attn_v
+  - level: 8
+    nodes:
+    - layer0_o_proj
+  - level: 9
+    nodes:
+    - layer0_attn_residual_add
+  - level: 10
+    nodes:
+    - layer0_router
+  - level: 11
     nodes:
     - layer0_expert0_gate_proj
     - layer0_expert0_up_proj
@@ -681,7 +697,7 @@ dag:
     - layer0_expert99_up_proj
     - layer0_expert9_gate_proj
     - layer0_expert9_up_proj
-  - level: 8
+  - level: 12
     nodes:
     - layer0_expert0_down_proj
     - layer0_expert100_down_proj
@@ -811,13 +827,13 @@ dag:
     - layer0_expert98_down_proj
     - layer0_expert99_down_proj
     - layer0_expert9_down_proj
-  - level: 9
+  - level: 13
     nodes:
     - layer0_moe_combine
-  - level: 10
+  - level: 14
     nodes:
     - layer0_mlp_residual_add
-  - level: 11
+  - level: 15
     nodes:
     - lm_head
   nodes:
@@ -853,6 +869,26 @@ dag:
       Q: 1
       K: 2048
       D: 128
+  - id: layer0_softmax_max
+    op_type: softmax_max
+    yaml_file: softmax_max.yaml
+    tensor_dims: &id001
+      B: 1
+      H: 32
+      Q: 1
+      K: 2048
+  - id: layer0_softmax_exp
+    op_type: softmax_exp
+    yaml_file: softmax_exp.yaml
+    tensor_dims: *id001
+  - id: layer0_softmax_sum
+    op_type: softmax_sum
+    yaml_file: softmax_sum.yaml
+    tensor_dims: *id001
+  - id: layer0_softmax_div
+    op_type: softmax_div
+    yaml_file: softmax_div.yaml
+    tensor_dims: *id001
   - id: layer0_v_proj
     op_type: linear
     yaml_file: k_proj.yaml
@@ -3991,18 +4027,18 @@ dag:
   - src: layer0_input
     dst: layer0_q_proj
     tensor_name: hidden_states
-    tensor_shape: &id001
+    tensor_shape: &id002
     - 1
     - 1
     - 2048
   - src: layer0_input
     dst: layer0_k_proj
     tensor_name: hidden_states
-    tensor_shape: *id001
+    tensor_shape: *id002
   - src: layer0_input
     dst: layer0_v_proj
     tensor_name: hidden_states
-    tensor_shape: *id001
+    tensor_shape: *id002
   - src: layer0_q_proj
     dst: layer0_attn_qk
     tensor_name: query
@@ -4020,13 +4056,29 @@ dag:
     - 2048
     - 128
   - src: layer0_attn_qk
-    dst: layer0_attn_v
+    dst: layer0_softmax_max
     tensor_name: scores
-    tensor_shape:
+    tensor_shape: &id003
     - 1
     - 32
     - 1
     - 2048
+  - src: layer0_softmax_max
+    dst: layer0_softmax_exp
+    tensor_name: scores_max
+    tensor_shape: *id003
+  - src: layer0_softmax_exp
+    dst: layer0_softmax_sum
+    tensor_name: scores_exp
+    tensor_shape: *id003
+  - src: layer0_softmax_sum
+    dst: layer0_softmax_div
+    tensor_name: scores_sum
+    tensor_shape: *id003
+  - src: layer0_softmax_div
+    dst: layer0_attn_v
+    tensor_name: attn_weights
+    tensor_shape: *id003
   - src: layer0_v_proj
     dst: layer0_attn_v
     tensor_name: value
@@ -4045,15 +4097,15 @@ dag:
   - src: layer0_o_proj
     dst: layer0_attn_residual_add
     tensor_name: o_proj_output
-    tensor_shape: *id001
+    tensor_shape: *id002
   - src: layer0_input
     dst: layer0_attn_residual_add
     tensor_name: residual
-    tensor_shape: *id001
+    tensor_shape: *id002
   - src: layer0_attn_residual_add
     dst: layer0_router
     tensor_name: post_attn
-    tensor_shape: *id001
+    tensor_shape: *id002
   - src: layer0_router
     dst: layer0_expert0_gate_proj
     tensor_name: routed_tokens
@@ -4071,14 +4123,14 @@ dag:
   - src: layer0_expert0_gate_proj
     dst: layer0_expert0_down_proj
     tensor_name: gate_output
-    tensor_shape: &id002
+    tensor_shape: &id004
     - 1
     - 1
     - 768
   - src: layer0_expert0_up_proj
     dst: layer0_expert0_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert1_gate_proj
     tensor_name: routed_tokens
@@ -4096,11 +4148,11 @@ dag:
   - src: layer0_expert1_gate_proj
     dst: layer0_expert1_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert1_up_proj
     dst: layer0_expert1_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert2_gate_proj
     tensor_name: routed_tokens
@@ -4118,11 +4170,11 @@ dag:
   - src: layer0_expert2_gate_proj
     dst: layer0_expert2_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert2_up_proj
     dst: layer0_expert2_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert3_gate_proj
     tensor_name: routed_tokens
@@ -4140,11 +4192,11 @@ dag:
   - src: layer0_expert3_gate_proj
     dst: layer0_expert3_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert3_up_proj
     dst: layer0_expert3_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert4_gate_proj
     tensor_name: routed_tokens
@@ -4162,11 +4214,11 @@ dag:
   - src: layer0_expert4_gate_proj
     dst: layer0_expert4_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert4_up_proj
     dst: layer0_expert4_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert5_gate_proj
     tensor_name: routed_tokens
@@ -4184,11 +4236,11 @@ dag:
   - src: layer0_expert5_gate_proj
     dst: layer0_expert5_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert5_up_proj
     dst: layer0_expert5_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert6_gate_proj
     tensor_name: routed_tokens
@@ -4206,11 +4258,11 @@ dag:
   - src: layer0_expert6_gate_proj
     dst: layer0_expert6_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert6_up_proj
     dst: layer0_expert6_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert7_gate_proj
     tensor_name: routed_tokens
@@ -4228,11 +4280,11 @@ dag:
   - src: layer0_expert7_gate_proj
     dst: layer0_expert7_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert7_up_proj
     dst: layer0_expert7_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert8_gate_proj
     tensor_name: routed_tokens
@@ -4250,11 +4302,11 @@ dag:
   - src: layer0_expert8_gate_proj
     dst: layer0_expert8_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert8_up_proj
     dst: layer0_expert8_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert9_gate_proj
     tensor_name: routed_tokens
@@ -4272,11 +4324,11 @@ dag:
   - src: layer0_expert9_gate_proj
     dst: layer0_expert9_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert9_up_proj
     dst: layer0_expert9_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert10_gate_proj
     tensor_name: routed_tokens
@@ -4294,11 +4346,11 @@ dag:
   - src: layer0_expert10_gate_proj
     dst: layer0_expert10_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert10_up_proj
     dst: layer0_expert10_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert11_gate_proj
     tensor_name: routed_tokens
@@ -4316,11 +4368,11 @@ dag:
   - src: layer0_expert11_gate_proj
     dst: layer0_expert11_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert11_up_proj
     dst: layer0_expert11_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert12_gate_proj
     tensor_name: routed_tokens
@@ -4338,11 +4390,11 @@ dag:
   - src: layer0_expert12_gate_proj
     dst: layer0_expert12_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert12_up_proj
     dst: layer0_expert12_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert13_gate_proj
     tensor_name: routed_tokens
@@ -4360,11 +4412,11 @@ dag:
   - src: layer0_expert13_gate_proj
     dst: layer0_expert13_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert13_up_proj
     dst: layer0_expert13_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert14_gate_proj
     tensor_name: routed_tokens
@@ -4382,11 +4434,11 @@ dag:
   - src: layer0_expert14_gate_proj
     dst: layer0_expert14_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert14_up_proj
     dst: layer0_expert14_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert15_gate_proj
     tensor_name: routed_tokens
@@ -4404,11 +4456,11 @@ dag:
   - src: layer0_expert15_gate_proj
     dst: layer0_expert15_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert15_up_proj
     dst: layer0_expert15_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert16_gate_proj
     tensor_name: routed_tokens
@@ -4426,11 +4478,11 @@ dag:
   - src: layer0_expert16_gate_proj
     dst: layer0_expert16_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert16_up_proj
     dst: layer0_expert16_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert17_gate_proj
     tensor_name: routed_tokens
@@ -4448,11 +4500,11 @@ dag:
   - src: layer0_expert17_gate_proj
     dst: layer0_expert17_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert17_up_proj
     dst: layer0_expert17_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert18_gate_proj
     tensor_name: routed_tokens
@@ -4470,11 +4522,11 @@ dag:
   - src: layer0_expert18_gate_proj
     dst: layer0_expert18_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert18_up_proj
     dst: layer0_expert18_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert19_gate_proj
     tensor_name: routed_tokens
@@ -4492,11 +4544,11 @@ dag:
   - src: layer0_expert19_gate_proj
     dst: layer0_expert19_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert19_up_proj
     dst: layer0_expert19_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert20_gate_proj
     tensor_name: routed_tokens
@@ -4514,11 +4566,11 @@ dag:
   - src: layer0_expert20_gate_proj
     dst: layer0_expert20_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert20_up_proj
     dst: layer0_expert20_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert21_gate_proj
     tensor_name: routed_tokens
@@ -4536,11 +4588,11 @@ dag:
   - src: layer0_expert21_gate_proj
     dst: layer0_expert21_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert21_up_proj
     dst: layer0_expert21_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert22_gate_proj
     tensor_name: routed_tokens
@@ -4558,11 +4610,11 @@ dag:
   - src: layer0_expert22_gate_proj
     dst: layer0_expert22_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert22_up_proj
     dst: layer0_expert22_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert23_gate_proj
     tensor_name: routed_tokens
@@ -4580,11 +4632,11 @@ dag:
   - src: layer0_expert23_gate_proj
     dst: layer0_expert23_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert23_up_proj
     dst: layer0_expert23_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert24_gate_proj
     tensor_name: routed_tokens
@@ -4602,11 +4654,11 @@ dag:
   - src: layer0_expert24_gate_proj
     dst: layer0_expert24_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert24_up_proj
     dst: layer0_expert24_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert25_gate_proj
     tensor_name: routed_tokens
@@ -4624,11 +4676,11 @@ dag:
   - src: layer0_expert25_gate_proj
     dst: layer0_expert25_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert25_up_proj
     dst: layer0_expert25_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert26_gate_proj
     tensor_name: routed_tokens
@@ -4646,11 +4698,11 @@ dag:
   - src: layer0_expert26_gate_proj
     dst: layer0_expert26_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert26_up_proj
     dst: layer0_expert26_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert27_gate_proj
     tensor_name: routed_tokens
@@ -4668,11 +4720,11 @@ dag:
   - src: layer0_expert27_gate_proj
     dst: layer0_expert27_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert27_up_proj
     dst: layer0_expert27_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert28_gate_proj
     tensor_name: routed_tokens
@@ -4690,11 +4742,11 @@ dag:
   - src: layer0_expert28_gate_proj
     dst: layer0_expert28_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert28_up_proj
     dst: layer0_expert28_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert29_gate_proj
     tensor_name: routed_tokens
@@ -4712,11 +4764,11 @@ dag:
   - src: layer0_expert29_gate_proj
     dst: layer0_expert29_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert29_up_proj
     dst: layer0_expert29_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert30_gate_proj
     tensor_name: routed_tokens
@@ -4734,11 +4786,11 @@ dag:
   - src: layer0_expert30_gate_proj
     dst: layer0_expert30_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert30_up_proj
     dst: layer0_expert30_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert31_gate_proj
     tensor_name: routed_tokens
@@ -4756,11 +4808,11 @@ dag:
   - src: layer0_expert31_gate_proj
     dst: layer0_expert31_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert31_up_proj
     dst: layer0_expert31_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert32_gate_proj
     tensor_name: routed_tokens
@@ -4778,11 +4830,11 @@ dag:
   - src: layer0_expert32_gate_proj
     dst: layer0_expert32_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert32_up_proj
     dst: layer0_expert32_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert33_gate_proj
     tensor_name: routed_tokens
@@ -4800,11 +4852,11 @@ dag:
   - src: layer0_expert33_gate_proj
     dst: layer0_expert33_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert33_up_proj
     dst: layer0_expert33_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert34_gate_proj
     tensor_name: routed_tokens
@@ -4822,11 +4874,11 @@ dag:
   - src: layer0_expert34_gate_proj
     dst: layer0_expert34_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert34_up_proj
     dst: layer0_expert34_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert35_gate_proj
     tensor_name: routed_tokens
@@ -4844,11 +4896,11 @@ dag:
   - src: layer0_expert35_gate_proj
     dst: layer0_expert35_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert35_up_proj
     dst: layer0_expert35_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert36_gate_proj
     tensor_name: routed_tokens
@@ -4866,11 +4918,11 @@ dag:
   - src: layer0_expert36_gate_proj
     dst: layer0_expert36_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert36_up_proj
     dst: layer0_expert36_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert37_gate_proj
     tensor_name: routed_tokens
@@ -4888,11 +4940,11 @@ dag:
   - src: layer0_expert37_gate_proj
     dst: layer0_expert37_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert37_up_proj
     dst: layer0_expert37_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert38_gate_proj
     tensor_name: routed_tokens
@@ -4910,11 +4962,11 @@ dag:
   - src: layer0_expert38_gate_proj
     dst: layer0_expert38_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert38_up_proj
     dst: layer0_expert38_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert39_gate_proj
     tensor_name: routed_tokens
@@ -4932,11 +4984,11 @@ dag:
   - src: layer0_expert39_gate_proj
     dst: layer0_expert39_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert39_up_proj
     dst: layer0_expert39_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert40_gate_proj
     tensor_name: routed_tokens
@@ -4954,11 +5006,11 @@ dag:
   - src: layer0_expert40_gate_proj
     dst: layer0_expert40_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert40_up_proj
     dst: layer0_expert40_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert41_gate_proj
     tensor_name: routed_tokens
@@ -4976,11 +5028,11 @@ dag:
   - src: layer0_expert41_gate_proj
     dst: layer0_expert41_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert41_up_proj
     dst: layer0_expert41_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert42_gate_proj
     tensor_name: routed_tokens
@@ -4998,11 +5050,11 @@ dag:
   - src: layer0_expert42_gate_proj
     dst: layer0_expert42_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert42_up_proj
     dst: layer0_expert42_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert43_gate_proj
     tensor_name: routed_tokens
@@ -5020,11 +5072,11 @@ dag:
   - src: layer0_expert43_gate_proj
     dst: layer0_expert43_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert43_up_proj
     dst: layer0_expert43_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert44_gate_proj
     tensor_name: routed_tokens
@@ -5042,11 +5094,11 @@ dag:
   - src: layer0_expert44_gate_proj
     dst: layer0_expert44_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert44_up_proj
     dst: layer0_expert44_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert45_gate_proj
     tensor_name: routed_tokens
@@ -5064,11 +5116,11 @@ dag:
   - src: layer0_expert45_gate_proj
     dst: layer0_expert45_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert45_up_proj
     dst: layer0_expert45_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert46_gate_proj
     tensor_name: routed_tokens
@@ -5086,11 +5138,11 @@ dag:
   - src: layer0_expert46_gate_proj
     dst: layer0_expert46_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert46_up_proj
     dst: layer0_expert46_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert47_gate_proj
     tensor_name: routed_tokens
@@ -5108,11 +5160,11 @@ dag:
   - src: layer0_expert47_gate_proj
     dst: layer0_expert47_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert47_up_proj
     dst: layer0_expert47_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert48_gate_proj
     tensor_name: routed_tokens
@@ -5130,11 +5182,11 @@ dag:
   - src: layer0_expert48_gate_proj
     dst: layer0_expert48_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert48_up_proj
     dst: layer0_expert48_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert49_gate_proj
     tensor_name: routed_tokens
@@ -5152,11 +5204,11 @@ dag:
   - src: layer0_expert49_gate_proj
     dst: layer0_expert49_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert49_up_proj
     dst: layer0_expert49_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert50_gate_proj
     tensor_name: routed_tokens
@@ -5174,11 +5226,11 @@ dag:
   - src: layer0_expert50_gate_proj
     dst: layer0_expert50_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert50_up_proj
     dst: layer0_expert50_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert51_gate_proj
     tensor_name: routed_tokens
@@ -5196,11 +5248,11 @@ dag:
   - src: layer0_expert51_gate_proj
     dst: layer0_expert51_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert51_up_proj
     dst: layer0_expert51_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert52_gate_proj
     tensor_name: routed_tokens
@@ -5218,11 +5270,11 @@ dag:
   - src: layer0_expert52_gate_proj
     dst: layer0_expert52_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert52_up_proj
     dst: layer0_expert52_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert53_gate_proj
     tensor_name: routed_tokens
@@ -5240,11 +5292,11 @@ dag:
   - src: layer0_expert53_gate_proj
     dst: layer0_expert53_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert53_up_proj
     dst: layer0_expert53_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert54_gate_proj
     tensor_name: routed_tokens
@@ -5262,11 +5314,11 @@ dag:
   - src: layer0_expert54_gate_proj
     dst: layer0_expert54_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert54_up_proj
     dst: layer0_expert54_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert55_gate_proj
     tensor_name: routed_tokens
@@ -5284,11 +5336,11 @@ dag:
   - src: layer0_expert55_gate_proj
     dst: layer0_expert55_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert55_up_proj
     dst: layer0_expert55_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert56_gate_proj
     tensor_name: routed_tokens
@@ -5306,11 +5358,11 @@ dag:
   - src: layer0_expert56_gate_proj
     dst: layer0_expert56_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert56_up_proj
     dst: layer0_expert56_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert57_gate_proj
     tensor_name: routed_tokens
@@ -5328,11 +5380,11 @@ dag:
   - src: layer0_expert57_gate_proj
     dst: layer0_expert57_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert57_up_proj
     dst: layer0_expert57_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert58_gate_proj
     tensor_name: routed_tokens
@@ -5350,11 +5402,11 @@ dag:
   - src: layer0_expert58_gate_proj
     dst: layer0_expert58_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert58_up_proj
     dst: layer0_expert58_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert59_gate_proj
     tensor_name: routed_tokens
@@ -5372,11 +5424,11 @@ dag:
   - src: layer0_expert59_gate_proj
     dst: layer0_expert59_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert59_up_proj
     dst: layer0_expert59_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert60_gate_proj
     tensor_name: routed_tokens
@@ -5394,11 +5446,11 @@ dag:
   - src: layer0_expert60_gate_proj
     dst: layer0_expert60_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert60_up_proj
     dst: layer0_expert60_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert61_gate_proj
     tensor_name: routed_tokens
@@ -5416,11 +5468,11 @@ dag:
   - src: layer0_expert61_gate_proj
     dst: layer0_expert61_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert61_up_proj
     dst: layer0_expert61_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert62_gate_proj
     tensor_name: routed_tokens
@@ -5438,11 +5490,11 @@ dag:
   - src: layer0_expert62_gate_proj
     dst: layer0_expert62_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert62_up_proj
     dst: layer0_expert62_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert63_gate_proj
     tensor_name: routed_tokens
@@ -5460,11 +5512,11 @@ dag:
   - src: layer0_expert63_gate_proj
     dst: layer0_expert63_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert63_up_proj
     dst: layer0_expert63_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert64_gate_proj
     tensor_name: routed_tokens
@@ -5482,11 +5534,11 @@ dag:
   - src: layer0_expert64_gate_proj
     dst: layer0_expert64_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert64_up_proj
     dst: layer0_expert64_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert65_gate_proj
     tensor_name: routed_tokens
@@ -5504,11 +5556,11 @@ dag:
   - src: layer0_expert65_gate_proj
     dst: layer0_expert65_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert65_up_proj
     dst: layer0_expert65_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert66_gate_proj
     tensor_name: routed_tokens
@@ -5526,11 +5578,11 @@ dag:
   - src: layer0_expert66_gate_proj
     dst: layer0_expert66_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert66_up_proj
     dst: layer0_expert66_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert67_gate_proj
     tensor_name: routed_tokens
@@ -5548,11 +5600,11 @@ dag:
   - src: layer0_expert67_gate_proj
     dst: layer0_expert67_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert67_up_proj
     dst: layer0_expert67_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert68_gate_proj
     tensor_name: routed_tokens
@@ -5570,11 +5622,11 @@ dag:
   - src: layer0_expert68_gate_proj
     dst: layer0_expert68_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert68_up_proj
     dst: layer0_expert68_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert69_gate_proj
     tensor_name: routed_tokens
@@ -5592,11 +5644,11 @@ dag:
   - src: layer0_expert69_gate_proj
     dst: layer0_expert69_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert69_up_proj
     dst: layer0_expert69_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert70_gate_proj
     tensor_name: routed_tokens
@@ -5614,11 +5666,11 @@ dag:
   - src: layer0_expert70_gate_proj
     dst: layer0_expert70_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert70_up_proj
     dst: layer0_expert70_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert71_gate_proj
     tensor_name: routed_tokens
@@ -5636,11 +5688,11 @@ dag:
   - src: layer0_expert71_gate_proj
     dst: layer0_expert71_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert71_up_proj
     dst: layer0_expert71_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert72_gate_proj
     tensor_name: routed_tokens
@@ -5658,11 +5710,11 @@ dag:
   - src: layer0_expert72_gate_proj
     dst: layer0_expert72_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert72_up_proj
     dst: layer0_expert72_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert73_gate_proj
     tensor_name: routed_tokens
@@ -5680,11 +5732,11 @@ dag:
   - src: layer0_expert73_gate_proj
     dst: layer0_expert73_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert73_up_proj
     dst: layer0_expert73_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert74_gate_proj
     tensor_name: routed_tokens
@@ -5702,11 +5754,11 @@ dag:
   - src: layer0_expert74_gate_proj
     dst: layer0_expert74_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert74_up_proj
     dst: layer0_expert74_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert75_gate_proj
     tensor_name: routed_tokens
@@ -5724,11 +5776,11 @@ dag:
   - src: layer0_expert75_gate_proj
     dst: layer0_expert75_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert75_up_proj
     dst: layer0_expert75_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert76_gate_proj
     tensor_name: routed_tokens
@@ -5746,11 +5798,11 @@ dag:
   - src: layer0_expert76_gate_proj
     dst: layer0_expert76_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert76_up_proj
     dst: layer0_expert76_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert77_gate_proj
     tensor_name: routed_tokens
@@ -5768,11 +5820,11 @@ dag:
   - src: layer0_expert77_gate_proj
     dst: layer0_expert77_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert77_up_proj
     dst: layer0_expert77_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert78_gate_proj
     tensor_name: routed_tokens
@@ -5790,11 +5842,11 @@ dag:
   - src: layer0_expert78_gate_proj
     dst: layer0_expert78_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert78_up_proj
     dst: layer0_expert78_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert79_gate_proj
     tensor_name: routed_tokens
@@ -5812,11 +5864,11 @@ dag:
   - src: layer0_expert79_gate_proj
     dst: layer0_expert79_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert79_up_proj
     dst: layer0_expert79_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert80_gate_proj
     tensor_name: routed_tokens
@@ -5834,11 +5886,11 @@ dag:
   - src: layer0_expert80_gate_proj
     dst: layer0_expert80_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert80_up_proj
     dst: layer0_expert80_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert81_gate_proj
     tensor_name: routed_tokens
@@ -5856,11 +5908,11 @@ dag:
   - src: layer0_expert81_gate_proj
     dst: layer0_expert81_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert81_up_proj
     dst: layer0_expert81_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert82_gate_proj
     tensor_name: routed_tokens
@@ -5878,11 +5930,11 @@ dag:
   - src: layer0_expert82_gate_proj
     dst: layer0_expert82_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert82_up_proj
     dst: layer0_expert82_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert83_gate_proj
     tensor_name: routed_tokens
@@ -5900,11 +5952,11 @@ dag:
   - src: layer0_expert83_gate_proj
     dst: layer0_expert83_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert83_up_proj
     dst: layer0_expert83_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert84_gate_proj
     tensor_name: routed_tokens
@@ -5922,11 +5974,11 @@ dag:
   - src: layer0_expert84_gate_proj
     dst: layer0_expert84_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert84_up_proj
     dst: layer0_expert84_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert85_gate_proj
     tensor_name: routed_tokens
@@ -5944,11 +5996,11 @@ dag:
   - src: layer0_expert85_gate_proj
     dst: layer0_expert85_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert85_up_proj
     dst: layer0_expert85_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert86_gate_proj
     tensor_name: routed_tokens
@@ -5966,11 +6018,11 @@ dag:
   - src: layer0_expert86_gate_proj
     dst: layer0_expert86_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert86_up_proj
     dst: layer0_expert86_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert87_gate_proj
     tensor_name: routed_tokens
@@ -5988,11 +6040,11 @@ dag:
   - src: layer0_expert87_gate_proj
     dst: layer0_expert87_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert87_up_proj
     dst: layer0_expert87_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert88_gate_proj
     tensor_name: routed_tokens
@@ -6010,11 +6062,11 @@ dag:
   - src: layer0_expert88_gate_proj
     dst: layer0_expert88_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert88_up_proj
     dst: layer0_expert88_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert89_gate_proj
     tensor_name: routed_tokens
@@ -6032,11 +6084,11 @@ dag:
   - src: layer0_expert89_gate_proj
     dst: layer0_expert89_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert89_up_proj
     dst: layer0_expert89_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert90_gate_proj
     tensor_name: routed_tokens
@@ -6054,11 +6106,11 @@ dag:
   - src: layer0_expert90_gate_proj
     dst: layer0_expert90_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert90_up_proj
     dst: layer0_expert90_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert91_gate_proj
     tensor_name: routed_tokens
@@ -6076,11 +6128,11 @@ dag:
   - src: layer0_expert91_gate_proj
     dst: layer0_expert91_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert91_up_proj
     dst: layer0_expert91_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert92_gate_proj
     tensor_name: routed_tokens
@@ -6098,11 +6150,11 @@ dag:
   - src: layer0_expert92_gate_proj
     dst: layer0_expert92_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert92_up_proj
     dst: layer0_expert92_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert93_gate_proj
     tensor_name: routed_tokens
@@ -6120,11 +6172,11 @@ dag:
   - src: layer0_expert93_gate_proj
     dst: layer0_expert93_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert93_up_proj
     dst: layer0_expert93_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert94_gate_proj
     tensor_name: routed_tokens
@@ -6142,11 +6194,11 @@ dag:
   - src: layer0_expert94_gate_proj
     dst: layer0_expert94_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert94_up_proj
     dst: layer0_expert94_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert95_gate_proj
     tensor_name: routed_tokens
@@ -6164,11 +6216,11 @@ dag:
   - src: layer0_expert95_gate_proj
     dst: layer0_expert95_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert95_up_proj
     dst: layer0_expert95_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert96_gate_proj
     tensor_name: routed_tokens
@@ -6186,11 +6238,11 @@ dag:
   - src: layer0_expert96_gate_proj
     dst: layer0_expert96_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert96_up_proj
     dst: layer0_expert96_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert97_gate_proj
     tensor_name: routed_tokens
@@ -6208,11 +6260,11 @@ dag:
   - src: layer0_expert97_gate_proj
     dst: layer0_expert97_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert97_up_proj
     dst: layer0_expert97_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert98_gate_proj
     tensor_name: routed_tokens
@@ -6230,11 +6282,11 @@ dag:
   - src: layer0_expert98_gate_proj
     dst: layer0_expert98_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert98_up_proj
     dst: layer0_expert98_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert99_gate_proj
     tensor_name: routed_tokens
@@ -6252,11 +6304,11 @@ dag:
   - src: layer0_expert99_gate_proj
     dst: layer0_expert99_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert99_up_proj
     dst: layer0_expert99_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert100_gate_proj
     tensor_name: routed_tokens
@@ -6274,11 +6326,11 @@ dag:
   - src: layer0_expert100_gate_proj
     dst: layer0_expert100_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert100_up_proj
     dst: layer0_expert100_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert101_gate_proj
     tensor_name: routed_tokens
@@ -6296,11 +6348,11 @@ dag:
   - src: layer0_expert101_gate_proj
     dst: layer0_expert101_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert101_up_proj
     dst: layer0_expert101_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert102_gate_proj
     tensor_name: routed_tokens
@@ -6318,11 +6370,11 @@ dag:
   - src: layer0_expert102_gate_proj
     dst: layer0_expert102_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert102_up_proj
     dst: layer0_expert102_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert103_gate_proj
     tensor_name: routed_tokens
@@ -6340,11 +6392,11 @@ dag:
   - src: layer0_expert103_gate_proj
     dst: layer0_expert103_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert103_up_proj
     dst: layer0_expert103_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert104_gate_proj
     tensor_name: routed_tokens
@@ -6362,11 +6414,11 @@ dag:
   - src: layer0_expert104_gate_proj
     dst: layer0_expert104_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert104_up_proj
     dst: layer0_expert104_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert105_gate_proj
     tensor_name: routed_tokens
@@ -6384,11 +6436,11 @@ dag:
   - src: layer0_expert105_gate_proj
     dst: layer0_expert105_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert105_up_proj
     dst: layer0_expert105_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert106_gate_proj
     tensor_name: routed_tokens
@@ -6406,11 +6458,11 @@ dag:
   - src: layer0_expert106_gate_proj
     dst: layer0_expert106_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert106_up_proj
     dst: layer0_expert106_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert107_gate_proj
     tensor_name: routed_tokens
@@ -6428,11 +6480,11 @@ dag:
   - src: layer0_expert107_gate_proj
     dst: layer0_expert107_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert107_up_proj
     dst: layer0_expert107_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert108_gate_proj
     tensor_name: routed_tokens
@@ -6450,11 +6502,11 @@ dag:
   - src: layer0_expert108_gate_proj
     dst: layer0_expert108_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert108_up_proj
     dst: layer0_expert108_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert109_gate_proj
     tensor_name: routed_tokens
@@ -6472,11 +6524,11 @@ dag:
   - src: layer0_expert109_gate_proj
     dst: layer0_expert109_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert109_up_proj
     dst: layer0_expert109_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert110_gate_proj
     tensor_name: routed_tokens
@@ -6494,11 +6546,11 @@ dag:
   - src: layer0_expert110_gate_proj
     dst: layer0_expert110_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert110_up_proj
     dst: layer0_expert110_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert111_gate_proj
     tensor_name: routed_tokens
@@ -6516,11 +6568,11 @@ dag:
   - src: layer0_expert111_gate_proj
     dst: layer0_expert111_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert111_up_proj
     dst: layer0_expert111_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert112_gate_proj
     tensor_name: routed_tokens
@@ -6538,11 +6590,11 @@ dag:
   - src: layer0_expert112_gate_proj
     dst: layer0_expert112_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert112_up_proj
     dst: layer0_expert112_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert113_gate_proj
     tensor_name: routed_tokens
@@ -6560,11 +6612,11 @@ dag:
   - src: layer0_expert113_gate_proj
     dst: layer0_expert113_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert113_up_proj
     dst: layer0_expert113_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert114_gate_proj
     tensor_name: routed_tokens
@@ -6582,11 +6634,11 @@ dag:
   - src: layer0_expert114_gate_proj
     dst: layer0_expert114_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert114_up_proj
     dst: layer0_expert114_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert115_gate_proj
     tensor_name: routed_tokens
@@ -6604,11 +6656,11 @@ dag:
   - src: layer0_expert115_gate_proj
     dst: layer0_expert115_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert115_up_proj
     dst: layer0_expert115_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert116_gate_proj
     tensor_name: routed_tokens
@@ -6626,11 +6678,11 @@ dag:
   - src: layer0_expert116_gate_proj
     dst: layer0_expert116_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert116_up_proj
     dst: layer0_expert116_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert117_gate_proj
     tensor_name: routed_tokens
@@ -6648,11 +6700,11 @@ dag:
   - src: layer0_expert117_gate_proj
     dst: layer0_expert117_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert117_up_proj
     dst: layer0_expert117_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert118_gate_proj
     tensor_name: routed_tokens
@@ -6670,11 +6722,11 @@ dag:
   - src: layer0_expert118_gate_proj
     dst: layer0_expert118_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert118_up_proj
     dst: layer0_expert118_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert119_gate_proj
     tensor_name: routed_tokens
@@ -6692,11 +6744,11 @@ dag:
   - src: layer0_expert119_gate_proj
     dst: layer0_expert119_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert119_up_proj
     dst: layer0_expert119_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert120_gate_proj
     tensor_name: routed_tokens
@@ -6714,11 +6766,11 @@ dag:
   - src: layer0_expert120_gate_proj
     dst: layer0_expert120_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert120_up_proj
     dst: layer0_expert120_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert121_gate_proj
     tensor_name: routed_tokens
@@ -6736,11 +6788,11 @@ dag:
   - src: layer0_expert121_gate_proj
     dst: layer0_expert121_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert121_up_proj
     dst: layer0_expert121_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert122_gate_proj
     tensor_name: routed_tokens
@@ -6758,11 +6810,11 @@ dag:
   - src: layer0_expert122_gate_proj
     dst: layer0_expert122_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert122_up_proj
     dst: layer0_expert122_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert123_gate_proj
     tensor_name: routed_tokens
@@ -6780,11 +6832,11 @@ dag:
   - src: layer0_expert123_gate_proj
     dst: layer0_expert123_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert123_up_proj
     dst: layer0_expert123_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert124_gate_proj
     tensor_name: routed_tokens
@@ -6802,11 +6854,11 @@ dag:
   - src: layer0_expert124_gate_proj
     dst: layer0_expert124_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert124_up_proj
     dst: layer0_expert124_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert125_gate_proj
     tensor_name: routed_tokens
@@ -6824,11 +6876,11 @@ dag:
   - src: layer0_expert125_gate_proj
     dst: layer0_expert125_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert125_up_proj
     dst: layer0_expert125_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert126_gate_proj
     tensor_name: routed_tokens
@@ -6846,11 +6898,11 @@ dag:
   - src: layer0_expert126_gate_proj
     dst: layer0_expert126_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert126_up_proj
     dst: layer0_expert126_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_router
     dst: layer0_expert127_gate_proj
     tensor_name: routed_tokens
@@ -6868,11 +6920,11 @@ dag:
   - src: layer0_expert127_gate_proj
     dst: layer0_expert127_down_proj
     tensor_name: gate_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert127_up_proj
     dst: layer0_expert127_down_proj
     tensor_name: up_output
-    tensor_shape: *id002
+    tensor_shape: *id004
   - src: layer0_expert0_down_proj
     dst: layer0_moe_combine
     tensor_name: expert_output
@@ -7772,11 +7824,11 @@ dag:
   - src: layer0_moe_combine
     dst: layer0_mlp_residual_add
     tensor_name: moe_output
-    tensor_shape: *id001
+    tensor_shape: *id002
   - src: layer0_attn_residual_add
     dst: layer0_mlp_residual_add
     tensor_name: residual
-    tensor_shape: *id001
+    tensor_shape: *id002
   - src: layer0_mlp_residual_add
     dst: lm_head
     tensor_name: final_hidden
